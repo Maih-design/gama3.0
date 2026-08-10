@@ -1,0 +1,202 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>
+        خطابات التحويل في انتظار الإصدار
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/main.css' %}"
+    >
+
+</head>
+
+
+<body>
+
+<div class="page">
+
+
+    <header class="page-header">
+
+        <div class="page-header__content">
+
+            <h1 class="page-title">
+                خطابات التحويل في انتظار الإصدار
+            </h1>
+
+            <p class="page-subtitle">
+                الحالات التي تحتاج إلى إصدار خطاب تحويل
+            </p>
+
+        </div>
+
+    </header>
+
+
+    <main class="page-content">
+
+
+        {% if messages %}
+
+            <div class="messages">
+
+                {% for message in messages %}
+
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+
+        <section class="page-section">
+
+
+            <div class="page-section__header">
+
+                <h2 class="page-section__title">
+                    الخطابات في الانتظار
+                </h2>
+
+            </div>
+
+
+            {% if pending_cases %}
+
+                <div class="data-table__wrapper">
+
+                    <table class="data-table referrals-table">
+
+                        <thead class="data-table__head">
+
+                            <tr>
+
+                                <th>#</th>
+
+                                <th>
+                                    اسم المريض
+                                </th>
+
+                                <th>
+                                    الرقم القومي
+                                </th>
+
+                                <th>
+                                    الإجراء
+                                </th>
+
+                                <th>
+                                    جلسة اللجنة
+                                </th>
+
+                                <th>
+                                    الإجراء
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody class="data-table__body">
+
+
+                            {% for case in pending_cases %}
+
+                                <tr class="data-table__row">
+
+
+                                    <td class="data-table__cell--number">
+                                        {{ forloop.counter }}
+                                    </td>
+
+
+                                    <td class="patient-name">
+
+                                        <a
+                                            href="{% url 'patient_detail' case.patient.pk %}"
+                                        >
+                                            {{ case.patient.full_name }}
+                                        </a>
+
+                                    </td>
+
+
+                                    <td class="patient-national-id">
+                                        {{ case.patient.national_id }}
+                                    </td>
+
+
+                                    <td>
+                                        {{ case.recommendation.procedure }}
+                                    </td>
+
+
+                                    <td>
+                                        {{ case.committee_session.session_date }}
+                                    </td>
+
+
+                                    <td class="table-actions">
+
+                                        <a
+                                            href="{% url 'referral_create' case.pk %}"
+                                            class="btn btn-primary btn-sm"
+                                        >
+                                            إصدار الخطاب
+                                        </a>
+
+                                    </td>
+
+
+                                </tr>
+
+                            {% endfor %}
+
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <div class="empty-state__title">
+                        لا توجد خطابات في انتظار الإصدار
+                    </div>
+
+                    <div class="empty-state__text">
+                        جميع الحالات التي تحتاج إلى تحويل تم إصدار خطاباتها.
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+
+        </section>
+
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

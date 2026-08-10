@@ -1,0 +1,190 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>إدخال قرارات الجلسة</title>
+
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+
+<body>
+
+<div class="page">
+
+    <header class="page-header">
+
+        <div class="page-header__content">
+
+            <h1 class="page-title">
+                إدخال قرارات الجلسة
+            </h1>
+
+            <p class="page-subtitle">
+                جلسة {{ session.session_date }}
+                - {{ session.doctor.full_name }}
+            </p>
+
+        </div>
+
+    </header>
+
+
+    <main class="page-content">
+
+        {% if messages %}
+
+            <div class="messages">
+
+                {% for message in messages %}
+
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+
+        <section class="page-section">
+
+            <div class="page-section__header">
+
+                <h2 class="page-section__title">
+                    قرارات الحالات
+                </h2>
+
+            </div>
+
+
+            <form method="post">
+
+                {% csrf_token %}
+
+
+                <div class="data-table__wrapper">
+
+                    <table class="data-table recommendations-table">
+
+                        <thead class="data-table__head">
+
+                            <tr>
+
+                                <th>#</th>
+
+                                <th>المريض</th>
+
+                                <th>الإجراء</th>
+
+                                <th>عدد الجلسات</th>
+
+                                <th>ملاحظات اللجنة</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody class="data-table__body">
+
+                            {% for item in recommendation_forms %}
+
+                                <tr class="data-table__row">
+
+                                    <td class="data-table__cell--number">
+                                        {{ forloop.counter }}
+                                    </td>
+
+
+                                    <td class="patient-name">
+
+                                        <a
+                                            href="{% url 'patient_detail' item.case.patient.pk %}"
+                                        >
+                                            {{ item.case.patient.full_name }}
+                                        </a>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {{ item.form.procedure }}
+
+                                        {% if item.form.procedure.errors %}
+
+                                            <div class="form-error">
+                                                {{ item.form.procedure.errors }}
+                                            </div>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {{ item.form.no_of_sessions }}
+
+                                        {% if item.form.no_of_sessions.errors %}
+
+                                            <div class="form-error">
+                                                {{ item.form.no_of_sessions.errors }}
+                                            </div>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {{ item.form.recommendation_text }}
+
+                                        {% if item.form.recommendation_text.errors %}
+
+                                            <div class="form-error">
+                                                {{ item.form.recommendation_text.errors }}
+                                            </div>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <div class="page-section__actions">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        حفظ القرارات
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

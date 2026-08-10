@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>جلسات اللجنة</title>
+</head>
+
+<body>
+
+    <main class="page-container">
+
+        <header class="page-header">
+            <h1 class="page-title">جلسات اللجنة</h1>
+
+            <a href="{% url 'session_create' %}" class="btn btn-primary">
+                إنشاء جلسة جديدة
+            </a>
+        </header>
+
+
+        {% if preparing_session %}
+
+            <section class="session-current-section">
+
+                <h2 class="section-title">
+                    الجلسة الحالية
+                </h2>
+
+                <article class="session-card session-card--current">
+
+                    <div class="session-card__info">
+
+                        <div class="session-field">
+                            <span class="session-field__label">
+                                تاريخ الجلسة
+                            </span>
+
+                            <span class="session-field__value">
+                                {{ preparing_session.session_date }}
+                            </span>
+                        </div>
+
+
+                        <div class="session-field">
+                            <span class="session-field__label">
+                                الطبيب الاستشاري
+                            </span>
+
+                            <span class="session-field__value">
+                                {{ preparing_session.doctor.full_name }}
+                            </span>
+                        </div>
+
+
+                        <div class="session-field">
+                            <span class="session-field__label">
+                                عدد الحالات
+                            </span>
+
+                            <span class="session-field__value">
+                                {{ preparing_session.cases.count }}
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="session-card__actions">
+
+                        <a
+                            href="{% url 'session_detail' preparing_session.pk %}"
+                            class="btn btn-primary"
+                        >
+                            فتح الجلسة
+                        </a>
+
+                    </div>
+
+                </article>
+
+            </section>
+
+        {% else %}
+
+            <section class="empty-state">
+
+                <h2 class="empty-state__title">
+                    لا توجد جلسة قيد التجهيز
+                </h2>
+
+                <p class="empty-state__text">
+                    يمكنك إنشاء جلسة جديدة للبدء في إضافة الحالات.
+                </p>
+
+                <a
+                    href="{% url 'session_create' %}"
+                    class="btn btn-primary"
+                >
+                    إنشاء جلسة جديدة
+                </a>
+
+            </section>
+
+        {% endif %}
+
+
+        <section class="sessions-list-section">
+
+            <h2 class="section-title">
+                جميع الجلسات
+            </h2>
+
+
+            {% if sessions %}
+
+                <div class="sessions-list">
+
+                    {% for session in sessions %}
+
+                        <article class="session-card">
+
+                            <div class="session-card__header">
+
+                                <h3 class="session-card__title">
+                                    جلسة {{ session.session_date }}
+                                </h3>
+
+                                <span class="session-status session-status--{{ session.status|lower }}">
+                                    {{ session.get_status_display }}
+                                </span>
+
+                            </div>
+
+
+                            <div class="session-card__info">
+
+                                <div class="session-field">
+
+                                    <span class="session-field__label">
+                                        الطبيب
+                                    </span>
+
+                                    <span class="session-field__value">
+                                        {{ session.doctor.full_name }}
+                                    </span>
+
+                                </div>
+
+
+                                <div class="session-field">
+
+                                    <span class="session-field__label">
+                                        عدد الحالات
+                                    </span>
+
+                                    <span class="session-field__value">
+                                        {{ session.cases.count }}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="session-card__actions">
+
+                                <a
+                                    href="{% url 'session_detail' session.pk %}"
+                                    class="btn btn-secondary"
+                                >
+                                    عرض الجلسة
+                                </a>
+
+                            </div>
+
+                        </article>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <p class="empty-state__text">
+                        لا توجد جلسات حتى الآن.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

@@ -1,0 +1,265 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>المرضى</title>
+
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+
+<body>
+
+<div class="page">
+
+    <header class="page-header">
+
+        <div class="page-header__content">
+            <h1 class="page-title">المرضى</h1>
+
+            <p class="page-subtitle">
+                قائمة المرضى المسجلين بالنظام
+            </p>
+        </div>
+
+        <div class="page-header__actions">
+
+            <a
+                href="{% url 'patient_create' %}"
+                class="btn btn-primary"
+            >
+                إضافة مريض جديد
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <section class="card patient-search">
+
+        <div class="card-body">
+
+            <form method="get" class="search" id="patient-search">
+
+                <div class="form-field">
+
+                    <label for="search-input" class="form-label">
+                        بحث عن مريض
+                    </label>
+
+                    <input
+                        type="text"
+                        name="q"
+                        id="search-input"
+                        class="form-input"
+                        value="{{ request.GET.q|default:'' }}"
+                        placeholder="اسم المريض أو الرقم القومي"
+                    >
+
+                </div>
+
+                <div class="search__actions">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        بحث
+                    </button>
+
+                    {% if request.GET.q %}
+
+                        <a
+                            href="{% url 'patient_list' %}"
+                            class="btn btn-secondary"
+                        >
+                            إلغاء البحث
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </section>
+
+
+    <main class="page-content">
+
+        {% if messages %}
+
+            <div class="messages">
+
+                {% for message in messages %}
+
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+
+        <section class="page-section patients-section">
+
+            <div class="page-section__header">
+
+                <h2 class="page-section__title">
+                    المرضى
+                </h2>
+
+            </div>
+
+
+            {% if patients %}
+
+                <div class="data-table__wrapper">
+
+                    <table class="data-table patients-table">
+
+                        <thead class="data-table__head">
+
+                            <tr>
+
+                                <th>#</th>
+
+                                <th>اسم المريض</th>
+
+                                <th>الرقم القومي</th>
+
+                                <th>الفرع</th>
+
+                                <th>التشخيص</th>
+
+                                <th>الإجراءات</th>
+
+                                {% if preparing_session %}
+                                    <th>الجلسة المفتوحة</th>
+                                {% endif %}
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody class="data-table__body">
+
+                            {% for patient in patients %}
+
+                                <tr class="data-table__row">
+
+                                    <td class="data-table__cell--number">
+                                        {{ forloop.counter }}
+                                    </td>
+
+
+                                    <td class="patient-name">
+                                        {{ patient.full_name }}
+                                    </td>
+
+
+                                    <td class="patient-national-id">
+                                        {{ patient.national_id }}
+                                    </td>
+
+
+                                    <td class="patient-branch">
+                                        {{ patient.get_affiliated_branch_display }}
+                                    </td>
+
+
+                                    <td class="patient-diagnosis">
+                                        {{ patient.diagnosis }}
+                                    </td>
+
+
+                                    <td class="table-actions">
+
+                                        <a
+                                            href="{% url 'patient_detail' patient.pk %}"
+                                            class="btn btn-secondary btn-sm"
+                                        >
+                                            عرض الملف
+                                        </a>
+
+                                    </td>
+
+
+                                    {% if preparing_session %}
+
+                                        <td class="table-actions">
+
+                                            {% if patient.id in patients_in_session %}
+
+                                                <span class="patient-session-status">
+                                                    مضاف للجلسة
+                                                </span>
+
+                                            {% else %}
+
+                                                <a
+                                                    href="{% url 'add_patient_to_session' patient.pk %}"
+                                                    class="btn btn-primary btn-sm"
+                                                >
+                                                    إضافة للجلسة
+                                                </a>
+
+                                            {% endif %}
+
+                                        </td>
+
+                                    {% endif %}
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <div class="empty-state__title">
+                        لا يوجد مرضى مسجلون
+                    </div>
+
+                    <div class="empty-state__text">
+                        يمكنك إضافة أول مريض من زر "إضافة مريض جديد".
+                    </div>
+
+                    <div class="empty-state__action">
+
+                        <a
+                            href="{% url 'patient_create' %}"
+                            class="btn btn-primary"
+                        >
+                            إضافة مريض جديد
+                        </a>
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

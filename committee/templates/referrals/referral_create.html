@@ -1,0 +1,170 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>
+        إصدار خطاب تحويل
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/main.css' %}"
+    >
+
+</head>
+
+<body>
+
+<div class="page">
+
+    <header class="page-header">
+
+        <div class="page-header__content">
+
+            <h1 class="page-title">
+                إصدار خطاب تحويل
+            </h1>
+
+            <p class="page-subtitle">
+                بيانات التحويل
+            </p>
+
+        </div>
+
+    </header>
+
+
+    <main class="page-content">
+
+        <section class="page-section">
+
+            <div class="page-section__header">
+
+                <h2 class="page-section__title">
+                    بيانات المريض
+                </h2>
+
+            </div>
+
+
+            <div class="session-details__info">
+
+                <div class="session-field">
+
+                    <span class="session-field__label">
+                        اسم المريض
+                    </span>
+
+                    <span class="session-field__value">
+                        {{ case.patient.full_name }}
+                    </span>
+
+                </div>
+
+
+                <div class="session-field">
+
+                    <span class="session-field__label">
+                        الرقم القومي
+                    </span>
+
+                    <span class="session-field__value">
+                        {{ case.patient.national_id }}
+                    </span>
+
+                </div>
+
+
+                <div class="session-field">
+
+                    <span class="session-field__label">
+                        الإجراء
+                    </span>
+
+                    <span class="session-field__value">
+                        {{ recommendation.procedure }}
+                    </span>
+
+                </div>
+
+
+                {% if recommendation.no_of_sessions %}
+
+                    <div class="session-field">
+
+                        <span class="session-field__label">
+                            عدد الجلسات
+                        </span>
+
+                        <span class="session-field__value">
+                            {{ recommendation.no_of_sessions }}
+                        </span>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+
+        <section class="page-section">
+
+            <div class="page-section__header">
+
+                <h2 class="page-section__title">
+                    بيانات التحويل
+                </h2>
+
+            </div>
+
+
+            <form method="post">
+
+                {% csrf_token %}
+
+                <div class="form-field">
+
+                    {{ form.referral_center.label_tag }}
+
+                    {{ form.referral_center }}
+
+                    {% if form.referral_center.errors %}
+
+                        <div class="form-error">
+                            {{ form.referral_center.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="page-section__actions">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        إصدار خطاب التحويل
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

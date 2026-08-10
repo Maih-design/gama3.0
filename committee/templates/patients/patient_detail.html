@@ -1,0 +1,300 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ملف المريض - {{ patient.full_name }}</title>
+
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+
+<body>
+
+<div class="page">
+
+    <header class="page-header">
+
+        <div class="page-header__content">
+
+            <h1 class="page-title">
+                ملف المريض
+            </h1>
+
+            <p class="page-subtitle patient-name">
+                {{ patient.full_name }}
+            </p>
+
+        </div>
+
+        <div class="page-header__actions">
+
+            <a
+                href="{% url 'patient_list' %}"
+                class="btn btn-secondary"
+            >
+                العودة للمرضى
+            </a>
+
+            <a
+                href="{% url 'patient_update' patient.pk %}"
+                class="btn btn-primary"
+            >
+                تعديل البيانات
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <main class="page-content">
+
+
+        <!-- Patient Information -->
+
+        <section class="card patient-info-card">
+
+            <div class="card-header">
+
+                <h2 class="card-title">
+                    بيانات المريض
+                </h2>
+
+            </div>
+
+
+            <div class="card-body">
+
+                <div class="patient-info">
+
+                    <div class="patient-info__item">
+
+                        <span class="patient-info__label">
+                            الاسم
+                        </span>
+
+                        <span class="patient-info__value patient-name">
+                            {{ patient.full_name }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="patient-info__item">
+
+                        <span class="patient-info__label">
+                            الرقم القومي
+                        </span>
+
+                        <span class="patient-info__value patient-national-id">
+                            {{ patient.national_id }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="patient-info__item">
+
+                        <span class="patient-info__label">
+                            النوع
+                        </span>
+
+                        <span class="patient-info__value">
+                            {{ patient.get_gender_display }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="patient-info__item">
+
+                        <span class="patient-info__label">
+                            قانون التأمين
+                        </span>
+
+                        <span class="patient-info__value">
+                            {{ patient.get_insurance_law_display }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="patient-info__item">
+
+                        <span class="patient-info__label">
+                            الرقم التأميني
+                        </span>
+
+                        <span class="patient-info__value patient-insurance-number">
+                            {{ patient.insurance_number }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="patient-info__item">
+
+                        <span class="patient-info__label">
+                            رقم الهاتف
+                        </span>
+
+                        <span class="patient-info__value patient-phone">
+                            {{ patient.phone_number|default:"-" }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="patient-info__item">
+
+                        <span class="patient-info__label">
+                            الفرع
+                        </span>
+
+                        <span class="patient-info__value patient-branch">
+                            {{ patient.get_affiliated_branch_display }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="patient-info__item">
+
+                        <span class="patient-info__label">
+                            التشخيص
+                        </span>
+
+                        <span class="patient-info__value patient-diagnosis">
+                            {{ patient.diagnosis }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Patient History -->
+
+        <section class="page-section patient-history-section">
+
+            <div class="page-section__header">
+
+                <h2 class="page-section__title">
+                    تاريخ عرض المريض على اللجنة
+                </h2>
+
+            </div>
+
+
+            {% if patient.committee_cases %}
+
+                <div class="patient-history">
+
+                    {% for case in patient.committee_cases.all %}
+
+                        <article class="patient-history__item">
+
+                            <div class="patient-history__date">
+
+                                {{ case.committee_session.session_date|date:"Y-m-d" }}
+
+                            </div>
+
+
+                            <div class="patient-history__doctor">
+
+                                الطبيب:
+                                {{ case.committee_session.doctor.full_name }}
+
+                            </div>
+
+
+                            <div class="patient-history__diagnosis">
+
+                                التشخيص:
+                                {{ patient.diagnosis }}
+
+                            </div>
+
+
+                            <div class="patient-history__recommendation">
+
+                                {% if case.recommendation %}
+
+                                    <strong>
+                                        التوصية:
+                                    </strong>
+
+                                    {{ case.recommendation.recommendation_text }}
+
+                                {% else %}
+
+                                    <span class="status status-pending">
+                                        لم تصدر توصية بعد
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            {% if case.recommendation %}
+
+                                <div class="patient-history__procedure">
+
+                                    الإجراء:
+                                    {{ case.recommendation.procedure.name }}
+
+                                </div>
+
+                            {% endif %}
+
+
+                            <div class="patient-history__actions">
+
+                                {% if case.recommendation %}
+
+                                    <a
+                                        href="{% url 'recommendation_print' case.pk %}"
+                                        class="btn btn-secondary btn-sm"
+                                    >
+                                        عرض القرار
+                                    </a>
+
+                                {% endif %}
+
+                            </div>
+
+                        </article>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <div class="empty-state__title">
+                        لم يتم عرض المريض على اللجنة من قبل
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+
+    </main>
+
+</div>
+
+</body>
+</html>

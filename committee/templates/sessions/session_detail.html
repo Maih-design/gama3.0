@@ -1,0 +1,189 @@
+<header class="section-header">
+
+    <h2 class="section-title">
+        حالات الجلسة
+    </h2>
+
+    <div class="section-header__actions">
+
+        {% if session.status == "PREPARING" %}
+
+            <a
+                href="{% url 'patient_list' %}"
+                class="btn btn-primary"
+            >
+                إضافة مرضى للجلسة
+            </a>
+
+            <a
+                href="{% url 'session_recommendations' session.pk %}"
+                class="btn btn-primary"
+            >
+                إدخال قرارات الحالات
+            </a>
+
+        {% endif %}
+
+
+        <a
+            href="{% url 'session_print' session.pk %}"
+            class="btn btn-secondary"
+        >
+            طباعة محضر الجلسة
+        </a>
+
+
+        {% if session.status == "PREPARING" %}
+
+            <form
+                method="post"
+                action="{% url 'session_complete' session.pk %}"
+                style="display: inline;"
+            >
+
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    إغلاق الجلسة
+                </button>
+
+            </form>
+
+        {% endif %}
+
+    </div>
+
+</header>
+
+
+<section class="session-details">
+
+    <div class="session-details__header">
+
+        <h2 class="section-title">
+            بيانات الجلسة
+        </h2>
+
+        <span class="session-status">
+            {{ session.get_status_display }}
+        </span>
+
+    </div>
+
+
+    <div class="session-details__info">
+
+        <div class="session-field">
+
+            <span class="session-field__label">
+                تاريخ الجلسة
+            </span>
+
+            <span class="session-field__value">
+                {{ session.session_date }}
+            </span>
+
+        </div>
+
+
+        <div class="session-field">
+
+            <span class="session-field__label">
+                الطبيب الاستشاري
+            </span>
+
+            <span class="session-field__value">
+                {{ session.doctor.full_name }}
+            </span>
+
+        </div>
+
+
+        <div class="session-field">
+
+            <span class="session-field__label">
+                عدد الحالات
+            </span>
+
+            <span class="session-field__value">
+                {{ session.cases.count }}
+            </span>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="session-cases">
+
+    <header class="section-header">
+
+        <h2 class="section-title">
+            حالات الجلسة
+        </h2>
+
+    </header>
+
+
+    <div class="cases-list">
+
+        {% for case in session.cases.all %}
+
+            <article class="case-card">
+
+                <div class="case-card__info">
+
+                    <h3 class="case-card__name">
+                        {{ case.patient.full_name }}
+                    </h3>
+
+
+                    <div class="case-card__field">
+
+                        <span class="case-card__label">
+                            الرقم القومي
+                        </span>
+
+                        <span class="case-card__value">
+                            {{ case.patient.national_id }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="case-card__field">
+
+                        <span class="case-card__label">
+                            الحالة
+                        </span>
+
+                        <span class="case-card__value">
+                            {{ case.get_status_display }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        {% empty %}
+
+            <div class="empty-state">
+
+                <p class="empty-state__text">
+                    لا توجد حالات مضافة إلى هذه الجلسة.
+                </p>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>

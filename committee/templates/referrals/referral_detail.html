@@ -1,0 +1,141 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>
+        خطاب التحويل
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/main.css' %}"
+    >
+
+</head>
+
+<body>
+
+<div class="page">
+
+    <header class="page-header">
+
+        <div class="page-header__content">
+
+            <h1 class="page-title">
+                خطاب التحويل
+            </h1>
+
+            <p class="page-subtitle">
+                تم إصدار خطاب التحويل بنجاح
+            </p>
+
+        </div>
+
+    </header>
+
+
+    <main class="page-content">
+
+        <section class="page-section">
+
+            <div class="session-details__info">
+
+                <div class="session-field">
+
+                    <span class="session-field__label">
+                        المريض
+                    </span>
+
+                    <span class="session-field__value">
+                        {{ referral.committee_case.patient.full_name }}
+                    </span>
+
+                </div>
+
+
+                <div class="session-field">
+
+                    <span class="session-field__label">
+                        الرقم القومي
+                    </span>
+
+                    <span class="session-field__value">
+                        {{ referral.committee_case.patient.national_id }}
+                    </span>
+
+                </div>
+
+
+                <div class="session-field">
+
+                    <span class="session-field__label">
+                        الإجراء
+                    </span>
+
+                    <span class="session-field__value">
+                        {{ referral.committee_case.recommendation.procedure }}
+                    </span>
+
+                </div>
+
+
+                <div class="session-field">
+
+                    <span class="session-field__label">
+                        جهة التحويل
+                    </span>
+
+                    <span class="session-field__value">
+                        {{ referral.referral_center }}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="page-section__actions">
+                <a
+                    href="{% url 'referral_print' referral.pk %}"
+                    class="btn btn-primary"
+                >
+                    طباعة خطاب التحويل
+                </a>
+
+                <a
+                    href="{% url 'referral_update' referral.pk %}"
+                    class="btn btn-secondary"
+                >
+                    تعديل خطاب التحويل
+                </a>
+
+                <a
+                    href="{% url 'referral_cancel' referral.pk %}"
+                    class="btn btn-secondary"
+                >
+                    إلغاء خطاب التحويل
+                </a>
+
+                <a
+                    href="{% url 'pending_referrals' %}"
+                    class="btn btn-secondary"
+                >
+                    خطابات التحويل في الانتظار
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

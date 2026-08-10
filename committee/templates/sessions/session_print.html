@@ -1,0 +1,182 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>
+        محضر جلسة اللجنة
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/main.css' %}"
+    >
+
+    <style>
+
+        @media print {
+
+            .print-actions {
+                display: none;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="page">
+
+    <div class="print-actions">
+
+        <button
+            onclick="window.print()"
+            class="btn btn-primary"
+        >
+            طباعة
+        </button>
+
+    </div>
+
+
+    <main class="print-document">
+
+        <header class="print-document__header">
+
+            <h1>
+                محضر جلسة اللجنة الطبية
+            </h1>
+
+            <p>
+                تاريخ الجلسة:
+                {{ session.session_date }}
+            </p>
+
+            <p>
+                الطبيب الاستشاري:
+                {{ session.doctor.full_name }}
+            </p>
+
+        </header>
+
+
+        <section class="print-document__section">
+
+            <h2>
+                قرارات الحالات
+            </h2>
+
+
+            <table class="data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>#</th>
+
+                        <th>
+                            اسم المريض
+                        </th>
+
+                        <th>
+                            الرقم القومي
+                        </th>
+
+                        <th>
+                            الإجراء
+                        </th>
+
+                        <th>
+                            عدد الجلسات
+                        </th>
+
+                        <th>
+                            توصية اللجنة
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for case in session.cases.all %}
+
+                        <tr>
+
+                            <td>
+                                {{ forloop.counter }}
+                            </td>
+
+                            <td>
+                                {{ case.patient.full_name }}
+                            </td>
+
+                            <td>
+                                {{ case.patient.national_id }}
+                            </td>
+
+                            <td>
+                                {{ case.recommendation.procedure }}
+                            </td>
+
+                            <td>
+
+                                {% if case.recommendation.no_of_sessions %}
+                                    {{ case.recommendation.no_of_sessions }}
+                                {% else %}
+                                    -
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                {% if case.recommendation.recommendation_text %}
+                                    {{ case.recommendation.recommendation_text }}
+                                {% else %}
+                                    -
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </section>
+
+
+        <footer class="print-document__footer">
+
+            <div>
+                توقيع الطبيب الاستشاري
+            </div>
+
+            <div>
+                توقيع اللجنة
+            </div>
+
+        </footer>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

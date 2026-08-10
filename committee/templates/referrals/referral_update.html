@@ -1,0 +1,104 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>
+        تعديل خطاب التحويل
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/main.css' %}"
+    >
+
+</head>
+
+<body>
+
+<div class="page">
+
+    <header class="page-header">
+
+        <div class="page-header__content">
+
+            <h1 class="page-title">
+                تعديل خطاب التحويل
+            </h1>
+
+            <p class="page-subtitle">
+                {{ referral.committee_case.patient.full_name }}
+            </p>
+
+        </div>
+
+    </header>
+
+
+    <main class="page-content">
+
+        <section class="page-section">
+
+            <div class="page-section__header">
+
+                <h2 class="page-section__title">
+                    بيانات التحويل
+                </h2>
+
+            </div>
+
+
+            <form method="post">
+
+                {% csrf_token %}
+
+                <div class="form-field">
+
+                    {{ form.referral_center.label_tag }}
+
+                    {{ form.referral_center }}
+
+                    {% if form.referral_center.errors %}
+
+                        <div class="form-error">
+                            {{ form.referral_center.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="page-section__actions">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        حفظ التعديل
+                    </button>
+
+                    <a
+                        href="{% url 'referral_detail' referral.pk %}"
+                        class="btn btn-secondary"
+                    >
+                        إلغاء
+                    </a>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

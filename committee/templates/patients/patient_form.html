@@ -1,0 +1,147 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>
+        {% if form.instance.pk %}
+            تعديل بيانات المريض
+        {% else %}
+            إضافة مريض جديد
+        {% endif %}
+    </title>
+
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+
+<body>
+
+<div class="page">
+
+    <header class="page-header">
+
+        <div class="page-header__content">
+
+            <h1 class="page-title">
+
+                {% if form.instance.pk %}
+                    تعديل بيانات المريض
+                {% else %}
+                    إضافة مريض جديد
+                {% endif %}
+
+            </h1>
+
+        </div>
+
+        <div class="page-header__actions">
+
+            <a
+                href="{% url 'patient_list' %}"
+                class="btn btn-secondary"
+            >
+                العودة للمرضى
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <main class="page-content">
+
+        <section class="card patient-form-card">
+
+            <div class="card-header">
+
+                <h2 class="card-title">
+                    بيانات المريض
+                </h2>
+
+            </div>
+
+
+            <div class="card-body">
+
+                <form
+                    method="post"
+                    class="form patient-form"
+                    id="patient-form"
+                >
+
+                    {% csrf_token %}
+
+
+                    {% if form.non_field_errors %}
+
+                        <div class="alert alert-error">
+
+                            {{ form.non_field_errors }}
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <div class="form-grid">
+
+                        {% for field in form %}
+
+                            <div class="form-field">
+
+                                {{ field.label_tag }}
+
+                                {{ field }}
+
+                                {% if field.help_text %}
+                                    <div class="form-help">
+                                        {{ field.help_text }}
+                                    </div>
+                                {% endif %}
+
+                                {% if field.errors %}
+                                    <div class="form-error">
+                                        {{ field.errors }}
+                                    </div>
+                                {% endif %}
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <div class="form-actions">
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                        >
+                            حفظ بيانات المريض
+                        </button>
+
+                        <a
+                            href="{% url 'patient_list' %}"
+                            class="btn btn-secondary"
+                        >
+                            إلغاء
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>
