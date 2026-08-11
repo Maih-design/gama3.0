@@ -35,6 +35,10 @@ class Procedure(models.Model):
         blank=True,
         null=True
     )
+    price_in_words = models.CharField(
+        max_length=500,
+        blank=True
+    )
 
     def __str__(self):
         return self.name

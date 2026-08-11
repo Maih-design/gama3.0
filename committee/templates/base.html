@@ -37,6 +37,7 @@
 
     <nav class="navbar">
 
+    <!-- الشعار واسم النظام -->
 
         <div class="navbar__brand">
 
@@ -49,7 +50,7 @@
             <div class="navbar__brand-text">
 
                 <div class="navbar__title">
-                    نظام اللجنة العليا للجاما نايف
+                    نظام اللجنة الطبية
                 </div>
 
                 <div class="navbar__subtitle">
@@ -61,9 +62,9 @@
         </div>
 
 
+        <!-- روابط النظام -->
 
         <div class="navbar__links">
-
 
             <a
                 href="{% url 'home' %}"
@@ -72,14 +73,12 @@
                 الرئيسية
             </a>
 
-
             <a
                 href="{% url 'patient_list' %}"
                 class="navbar__link"
             >
                 المرضى
             </a>
-
 
             <a
                 href="{% url 'session_list' %}"
@@ -88,7 +87,6 @@
                 الجلسات
             </a>
 
-
             <a
                 href="{% url 'pending_referrals' %}"
                 class="navbar__link"
@@ -96,73 +94,78 @@
                 التحويلات
             </a>
 
-
-            <!-- Login - مؤقتًا -->
-
-            <a
-                href="#"
-                class="navbar__link navbar__link--login"
-            >
-                تسجيل الدخول
-            </a>
+        </div>
 
 
-            {% if request.user.is_staff %}
+        <!-- المستخدم والإدارة -->
+
+        <div class="navbar__account">
+
+            {% if request.user.is_authenticated %}
+
+                <span class="navbar__user-name">
+                    {{ request.user.get_full_name|default:request.user.username }}
+                </span>
+
+
+                {% if request.user.is_staff %}
+
+                    <a
+                        href="/admin/"
+                        class="navbar__account-link"
+                    >
+                        الإدارة
+                    </a>
+
+                {% endif %}
+
+
+                <form
+                    method="post"
+                    action="{% url 'logout' %}"
+                    style="display: inline;"
+                >
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="navbar__account-link navbar__account-link--logout"
+                    >
+                        تسجيل الخروج
+                    </button>
+                </form>
+
+            {% else %}
 
                 <a
-                    href="/admin/"
-                    class="navbar__link"
+                    href="{% url 'login' %}"
+                    class="navbar__account-link"
                 >
-                    الإدارة
+                    تسجيل الدخول
                 </a>
 
             {% endif %}
 
         </div>
 
-
-
-        <div class="navbar__user">
-
-
-            {% if request.user.is_authenticated %}
-
-                <span class="navbar__user-name">
-
-                    {{ request.user.get_full_name|default:request.user.username }}
-
-                </span>
-
-            {% else %}
-
-                <span class="navbar__user-name">
-                    زائر
-                </span>
-
-            {% endif %}
-
-
-        </div>
-
-
     </nav>
 
 
 
-    <!-- =========================
-         Page Content
-    ========================== -->
+        <!-- =========================
+            Page Content
+        ========================== -->
 
-    <main class="app__content">
+        <main class="app__content">
 
-        {% block content %}
+            {% block content %}
 
-        {% endblock %}
+            {% endblock %}
 
-    </main>
+        </main>
 
 
-</div>
+    </div>
 
 
 </body>

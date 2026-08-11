@@ -1,0 +1,135 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>تسجيل الدخول - نظام اللجنة الطبية</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/main.css' %}"
+    >
+
+</head>
+
+
+<body class="login-page">
+
+
+    <main class="login-container">
+
+
+        <section class="login-card">
+
+
+            <div class="login-card__header">
+
+                <img
+                    src="{% static 'images/logo.png' %}"
+                    alt="شعار النظام"
+                    class="login-card__logo"
+                >
+
+                <h1 class="login-card__title">
+                    نظام اللجنة الطبية
+                </h1>
+
+                <p class="login-card__subtitle">
+                    تسجيل الدخول
+                </p>
+
+            </div>
+
+
+            {% if form.errors %}
+
+                <div class="alert alert-error">
+                    اسم المستخدم أو كلمة المرور غير صحيحة.
+                </div>
+
+            {% endif %}
+
+
+            <form method="post" class="login-form">
+
+                {% csrf_token %}
+
+
+                <div class="form-field">
+
+                    <label
+                        for="id_username"
+                        class="form-label"
+                    >
+                        اسم المستخدم
+                    </label>
+
+                    <input
+                        type="text"
+                        name="username"
+                        id="id_username"
+                        class="form-input"
+                        autocomplete="username"
+                        required
+                        autofocus
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label
+                        for="id_password"
+                        class="form-label"
+                    >
+                        كلمة المرور
+                    </label>
+
+                    <input
+                        type="password"
+                        name="password"
+                        id="id_password"
+                        class="form-input"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary login-form__submit"
+                >
+                    تسجيل الدخول
+                </button>
+
+
+                <input
+                    type="hidden"
+                    name="next"
+                    value="{{ next }}"
+                >
+
+            </form>
+
+
+        </section>
+
+
+    </main>
+
+
+</body>
+
+</html>

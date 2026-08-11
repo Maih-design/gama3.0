@@ -1,7 +1,8 @@
+{% extends "base.html" %}
+
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+{% block content %}
 
 <head>
 
@@ -242,9 +243,24 @@
                 الإجراء الطبي المطلوب:
             </h3>
 
+
             <div class="prnt-procedure-box__value">
 
-                {{ referral.committee_case.recommendation.procedure }}
+                {% if referral.committee_case.recommendation.procedure.category == "جراحة إشعاعية" %}
+
+                    إجراء
+                    {{ referral.committee_case.recommendation.no_of_sessions }}
+                    جلسات
+                    {{ referral.committee_case.recommendation.procedure.name }}
+                    بتكلفة
+                    {{ referral.committee_case.recommendation.procedure.price_in_words }}
+                    طبقًا لسعر اللائحة.
+
+                {% else %}
+
+                    {{ referral.committee_case.recommendation.procedure }}
+
+                {% endif %}
 
             </div>
 
@@ -337,4 +353,4 @@
 
 </body>
 
-</html>
+{% endblock %}
