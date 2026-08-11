@@ -1,0 +1,555 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap');
+
+
+* {
+    box-sizing: border-box;
+}
+
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background: #f3f4f6;
+    color: #111827;
+    direction: rtl;
+    font-family: "IBM Plex Sans Arabic", "Segoe UI", sans-serif;
+}
+
+
+/* =========================
+   Print Toolbar
+========================= */
+
+.print-toolbar {
+    background: #ffffff;
+    border-bottom: 1px solid #d1d5db;
+    padding: 1rem 2rem;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+
+.print-toolbar__info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+
+.print-toolbar__title {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #111827;
+}
+
+
+.print-toolbar__subtitle {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+
+.print-toolbar__actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+
+.print-btn {
+    display: inline-block;
+    border: 0;
+    padding: 0.65rem 1.1rem;
+    border-radius: 6px;
+
+    text-decoration: none;
+
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.print-btn--primary {
+    background: #047857;
+    color: #ffffff;
+}
+
+
+.print-btn--secondary {
+    background: #6b7280;
+    color: #ffffff;
+}
+
+
+/* =========================
+   Page
+========================= */
+
+.prnt-page-border {
+
+    width: 210mm;
+    min-height: 297mm;
+
+    margin: 2rem auto;
+
+    background: #ffffff;
+
+    border: 2px solid #000000;
+
+    padding: 1cm;
+
+    position: relative;
+
+    box-sizing: border-box;
+}
+
+
+.prnt-document {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+
+    min-height: calc(297mm - 2cm);
+}
+
+
+/* =========================
+   Header
+========================= */
+
+.prnt-header {
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    border-bottom: 2px solid #047857;
+
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+
+
+.prnt-header__right {
+
+    text-align: right;
+
+    font-size: 1rem;
+    font-weight: 700;
+
+    line-height: 1.6;
+
+    width: 35%;
+}
+
+
+.prnt-header__logo {
+
+    width: 30%;
+    text-align: center;
+}
+
+
+.prnt-header__logo img {
+
+    max-width: 85px;
+    max-height: 85px;
+
+    object-fit: contain;
+}
+
+
+.prnt-header__left {
+
+    width: 35%;
+
+    text-align: left;
+
+    font-size: 0.9rem;
+
+    line-height: 1.7;
+}
+
+
+/* =========================
+   Title
+========================= */
+
+.prnt-title {
+
+    text-align: center;
+
+    font-size: 1.6rem;
+    font-weight: 700;
+
+    color: #047857;
+
+    margin: 1.5rem 0;
+}
+
+
+/* =========================
+   Direction
+========================= */
+
+.prnt-direction-text {
+
+    font-size: 1.1rem;
+    font-weight: 700;
+
+    color: #111827;
+
+    margin-bottom: 1rem;
+
+    line-height: 1.8;
+}
+
+
+.prnt-direction-text .sub-text {
+
+    display: block;
+
+    margin-top: 0.4rem;
+
+    font-size: 1rem;
+    font-weight: 500;
+
+    color: #374151;
+}
+
+
+.prnt-introduction {
+
+    font-size: 1rem;
+    font-weight: 500;
+
+    line-height: 1.9;
+
+    margin-bottom: 1.5rem;
+
+    color: #111827;
+}
+
+
+/* =========================
+   Patient Information
+========================= */
+
+.prnt-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 1.1rem;
+
+    margin-bottom: 1.8rem;
+}
+
+
+.prnt-field {
+
+    border-bottom: 1px dashed #6b7280;
+
+    padding-bottom: 0.4rem;
+
+    display: flex;
+
+    gap: 0.5rem;
+
+    align-items: baseline;
+}
+
+
+.prnt-field__label {
+
+    font-weight: 700;
+
+    color: #374151;
+
+    white-space: nowrap;
+}
+
+
+.prnt-field__value {
+
+    color: #000000;
+
+    font-weight: 600;
+}
+
+
+.prnt-national-id {
+
+    font-family: monospace;
+
+    letter-spacing: 0.05em;
+
+    direction: ltr;
+}
+
+
+/* =========================
+   Text Blocks
+========================= */
+
+.prnt-block {
+
+    background: #f9fafb;
+
+    border-right: 4px solid #047857;
+
+    padding: 1rem;
+
+    margin-bottom: 1.4rem;
+}
+
+
+.note-block {
+
+    border-right-color: #6b7280;
+}
+
+
+.prnt-block__title {
+
+    font-size: 1.05rem;
+
+    font-weight: 700;
+
+    color: #047857;
+
+    margin: 0 0 0.5rem 0;
+}
+
+
+.prnt-block__text {
+
+    font-size: 1rem;
+
+    line-height: 1.7;
+
+    color: #111827;
+}
+
+
+/* =========================
+   Procedure
+========================= */
+
+.prnt-procedure-box {
+
+    border: 2px solid #047857;
+
+    background: #f0fdf4;
+
+    padding: 1.1rem;
+
+    margin-bottom: 1.4rem;
+
+    border-radius: 6px;
+
+    text-align: right;
+}
+
+
+.prnt-procedure-box__title {
+
+    font-size: 1.1rem;
+
+    font-weight: 700;
+
+    color: #047857;
+
+    margin: 0 0 0.5rem 0;
+}
+
+
+.prnt-procedure-box__value {
+
+    font-size: 1.15rem;
+
+    font-weight: 700;
+
+    color: #065f46;
+
+    margin-bottom: 0.4rem;
+}
+
+
+.prnt-procedure-box__sessions {
+
+    font-size: 0.95rem;
+
+    color: #374151;
+}
+
+
+/* =========================
+   Closing
+========================= */
+
+.prnt-closing {
+
+    text-align: right;
+
+    font-size: 1rem;
+
+    font-weight: 500;
+
+    line-height: 1.8;
+
+    margin: 2rem 0;
+}
+
+
+/* =========================
+   Signature
+========================= */
+
+.prnt-signatures {
+
+    display: flex;
+
+    justify-content: flex-start;
+
+    align-items: flex-start;
+
+    padding: 0 0.5rem;
+    margin-top: 2.5rem;
+
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+
+.prnt-signature-block {
+
+    text-align: center;
+
+    width: 40%;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+
+.prnt-signature-block__title {
+
+    font-weight: 700;
+
+    color: #111827;
+
+    font-size: 1rem;
+
+    margin-bottom: 0.5rem;
+}
+
+
+.prnt-signature-block__space {
+
+    height: 1.5cm;
+}
+
+
+.prnt-signature-block__line {
+
+    font-size: 1rem;
+
+    font-weight: 600;
+
+    color: #111827;
+}
+
+
+/* =========================
+   Footer
+========================= */
+
+.prnt-footer-user {
+    margin-top: 2rem;
+    border-top: 1px solid #d1d5db;
+    padding-top: 0.3rem;
+
+    font-size: 0.8rem;
+    color: #4b5563;
+
+    text-align: right;
+}
+
+
+/* =========================
+   Print
+========================= */
+
+@media print {
+
+    @page {
+
+        size: A4;
+        margin: 0;
+    }
+
+
+    html,
+    body {
+
+        background: #ffffff !important;
+
+        color: #000000 !important;
+
+        font-size: 11pt !important;
+    }
+
+
+    .no-print,
+    .print-toolbar {
+
+        display: none !important;
+    }
+
+
+    .prnt-page-border {
+
+        width: 210mm;
+        min-height: 297mm;
+
+        margin: 0 !important;
+
+        border: 2px solid #000000 !important;
+
+        padding: 1cm !important;
+
+        box-shadow: none !important;
+    }
+
+
+    .prnt-document {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+
+    * {
+
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .prnt-signatures,
+    .prnt-signature-block,
+    .prnt-signature-block__title,
+    .prnt-signature-block__space,
+    .prnt-signature-block__line {
+        display: block !important;
+        visibility: visible !important;
+    }
+
+}

@@ -1,27 +1,84 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>نظام اللجنة الطبية</title>
-</head>
+{% block title %}
+    الرئيسية - نظام اللجنة العليا للجاما نايف
+{% endblock %}
 
-<body>
 
-    <main>
+{% block content %}
 
-        <h1>نظام إدارة اللجنة الطبية</h1>
+<main class="home-page">
 
-        <section>
+    <header class="page-header">
 
-            <a href="{% url 'patient_list' %}">
+        <div class="page-header__content">
+
+            <h1 class="page-title">
+                نظام إدارة اللجنة العليا للجاما نايف
+            </h1>
+
+            <p class="page-subtitle">
+                إدارة المرضى والجلسات والقرارات وخطابات التحويل
+            </p>
+
+        </div>
+
+    </header>
+
+
+    <section class="home-grid">
+
+
+        <a
+            href="{% url 'patient_list' %}"
+            class="home-card"
+        >
+
+            <h2>
                 المرضى
-            </a>
+            </h2>
 
-        </section>
+            <p>
+                عرض وإدارة ملفات المرضى.
+            </p>
 
-    </main>
+        </a>
 
-</body>
 
-</html>
+        <a
+            href="{% url 'session_list' %}"
+            class="home-card"
+        >
+
+            <h2>
+                الجلسات
+            </h2>
+
+            <p>
+                إنشاء ومتابعة جلسات اللجنة وقرارات الحالات.
+            </p>
+
+        </a>
+
+
+        <a
+            href="{% url 'pending_referrals' %}"
+            class="home-card"
+        >
+
+            <h2>
+                التحويلات
+            </h2>
+
+            <p>
+                متابعة خطابات التحويل في انتظار الإصدار.
+            </p>
+
+        </a>
+
+
+    </section>
+
+</main>
+
+{% endblock %}
