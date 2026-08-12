@@ -7,9 +7,10 @@
 
 {% block content %}
 
-<main class="home-page">
+<main class="home-page page-content">
 
-    <header class="page-header">
+
+    <header class="page-header home-page__header">
 
         <div class="page-header__content">
 
@@ -26,58 +27,79 @@
     </header>
 
 
-    <section class="home-grid">
+    <section class="dashboard home-dashboard">
+
+        <div class="dashboard-grid">
+
+            <a
+                href="{% url 'patient_list' %}"
+                class="card home-card"
+            >
+                <div class="card-body">
+
+                    <div class="home-card__icon">
+                        👥
+                    </div>
+
+                    <h2 class="card-title">
+                        المرضى
+                    </h2>
+
+                    <p class="card-subtitle">
+                        عرض وإدارة ملفات المرضى وبياناتهم.
+                    </p>
+
+                </div>
+            </a>
 
 
-        <a
-            href="{% url 'patient_list' %}"
-            class="home-card"
-        >
+            <a
+                href="{% url 'session_list' %}"
+                class="card home-card"
+            >
+                <div class="card-body">
 
-            <h2>
-                المرضى
-            </h2>
+                    <div class="home-card__icon">
+                        📋
+                    </div>
 
-            <p>
-                عرض وإدارة ملفات المرضى.
-            </p>
+                    <h2 class="card-title">
+                        جلسات اللجنة
+                    </h2>
 
-        </a>
+                    <p class="card-subtitle">
+                        إنشاء ومتابعة جلسات اللجنة وقرارات الحالات.
+                    </p>
 
-
-        <a
-            href="{% url 'session_list' %}"
-            class="home-card"
-        >
-
-            <h2>
-                الجلسات
-            </h2>
-
-            <p>
-                إنشاء ومتابعة جلسات اللجنة وقرارات الحالات.
-            </p>
-
-        </a>
+                </div>
+            </a>
 
 
-        <a
-            href="{% url 'pending_referrals' %}"
-            class="home-card"
-        >
+            <a
+                href="{% url 'pending_referrals' %}"
+                class="card home-card"
+            >
+                <div class="card-body">
 
-            <h2>
-                التحويلات
-            </h2>
+                    <div class="home-card__icon">
+                        📄
+                    </div>
 
-            <p>
-                متابعة خطابات التحويل في انتظار الإصدار.
-            </p>
+                    <h2 class="card-title">
+                        خطابات التحويل
+                    </h2>
 
-        </a>
+                    <p class="card-subtitle">
+                        متابعة خطابات التحويل الصادرة والتي في انتظار الإصدار.
+                    </p>
 
+                </div>
+            </a>
+
+        </div>
 
     </section>
+
 
 </main>
 

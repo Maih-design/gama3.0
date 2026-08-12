@@ -182,7 +182,7 @@
                                     </td>
 
 
-                                    <td class="table-actions">
+                                    <td class="data-table__cell--actions">
 
                                         <a
                                             href="{% url 'patient_detail' patient.pk %}"
@@ -196,26 +196,27 @@
 
                                     {% if preparing_session %}
 
-                                        <td class="table-actions">
+                                    <td class="data-table__cell--actions">
+                                        <div class="table-actions">
 
-                                            {% if patient.id in patients_in_session %}
+                                        {% if patient.id in patients_in_session %}
 
-                                                <span class="patient-session-status">
-                                                    مضاف للجلسة
-                                                </span>
+                                            <span class="patient-session-status">
+                                                مضاف للجلسة
+                                            </span>
 
-                                            {% else %}
+                                        {% else %}
 
-                                                <a
-                                                    href="{% url 'add_patient_to_session' patient.pk %}"
-                                                    class="btn btn-primary btn-sm"
-                                                >
-                                                    إضافة للجلسة
-                                                </a>
+                                            <a
+                                                href="{% url 'add_patient_to_session' patient.pk %}"
+                                                class="btn btn-primary btn-sm"
+                                            >
+                                                إضافة للجلسة
+                                            </a>
 
-                                            {% endif %}
-
-                                        </td>
+                                        {% endif %}
+                                        </div>
+                                    </td>
 
                                     {% endif %}
 

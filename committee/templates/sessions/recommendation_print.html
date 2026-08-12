@@ -4,40 +4,16 @@
 
 {% block content %}
 
-<head>
+<main class="page print-page">
 
-    <meta charset="UTF-8">
+    <div class="print-actions no-print">
 
-    <title>
-        قرار اللجنة - {{ case.patient.full_name }}
-    </title>
-
-    <link
-        rel="stylesheet"
-        href="{% static 'css/main.css' %}"
-    >
-
-    <style>
-
-        @media print {
-
-            .print-actions {
-                display: none;
-            }
-
-        }
-
-    </style>
-
-</head>
-
-
-<body>
-
-<div class="page">
-
-
-    <div class="print-actions">
+        <a
+            href="{% url 'patient_detail' case.patient.pk %}"
+            class="btn btn-secondary"
+        >
+            العودة لملف المريض
+        </a>
 
         <button
             onclick="window.print()"
@@ -51,87 +27,181 @@
 
     <main class="print-document">
 
-        <header class="print-document__header">
+        <header class="print-header">
 
-            <h1>
-                قرار اللجنة الطبية
-            </h1>
+            <div class="print-header__right">
+
+                <div class="print-header__organization">
+                    <div>الإدارة العامة للخدمات الطبية</div>
+                    <div>اللجنة العليا للجاما نايف</div>
+                </div>
+
+            </div>
+
+
+            <div class="print-header__center">
+
+                <img
+                    src="{% static 'images/logo.png' %}"
+                    alt="شعار النظام"
+                    class="navbar__logo"
+                >
+
+            </div>
+
+
+            <div class="print-header__left">
+
+                <div>
+                    <strong>تاريخ الجلسة:</strong>
+                    {{ case.committee_session.session_date }}
+                </div>
+
+            </div>
 
         </header>
 
 
-        <section class="print-document__section">
-
-            <p>
-                <strong>اسم المريض:</strong>
-                {{ case.patient.full_name }}
-            </p>
-
-            <p>
-                <strong>الرقم القومي:</strong>
-                {{ case.patient.national_id }}
-            </p>
-
-            <p>
-                <strong>تاريخ الجلسة:</strong>
-                {{ case.committee_session.session_date }}
-            </p>
-
-            <hr>
+        <h1 class="print-title">
+            قرار اللجنة الطبية
+        </h1>
 
 
-            <p>
-                <strong>الإجراء:</strong>
-                {{ recommendation.procedure }}
-            </p>
+        <section class="print-section">
+
+            <h2 class="print-section__title">
+                بيانات المريض
+            </h2>
+
+
+            <div class="recommendation-document__patient">
+
+                <div class="recommendation-document__field">
+
+                    <span class="print-section__label">
+                        اسم المريض
+                    </span>
+
+                    <span class="recommendation-document__value patient-name">
+                        {{ case.patient.full_name }}
+                    </span>
+
+                </div>
+
+
+                <div class="recommendation-document__field">
+
+                    <span class="print-section__label">
+                        الرقم القومي
+                    </span>
+
+                    <span class="recommendation-document__value patient-national-id">
+                        {{ case.patient.national_id }}
+                    </span>
+
+                </div>
+
+
+                <div class="recommendation-document__field">
+
+                    <span class="print-section__label">
+                        تاريخ الجلسة
+                    </span>
+
+                    <span class="recommendation-document__value">
+                        {{ case.committee_session.session_date }}
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="print-section">
+
+            <h2 class="print-section__title">
+                قرار اللجنة
+            </h2>
+
+
+            <div class="recommendation-document__procedure">
+
+                <span class="print-section__label">
+                    الإجراء
+                </span>
+
+                <strong>
+                    {{ recommendation.procedure }}
+                </strong>
+
+            </div>
 
 
             {% if recommendation.no_of_sessions %}
 
-                <p>
-                    <strong>عدد الجلسات:</strong>
-                    {{ recommendation.no_of_sessions }}
-                </p>
+                <div class="recommendation-document__field">
+
+                    <span class="print-section__label">
+                        عدد الجلسات
+                    </span>
+
+                    <span class="recommendation-document__value">
+                        {{ recommendation.no_of_sessions }}
+                    </span>
+
+                </div>
 
             {% endif %}
 
 
             {% if recommendation.recommendation_text %}
 
-                <p>
+                <div class="recommendation-document__text">
 
-                    <strong>
-                        توصية اللجنة:
-                    </strong>
+                    <h3 class="print-section__title">
+                        توصية اللجنة
+                    </h3>
 
-                </p>
+                    <p>
+                        {{ recommendation.recommendation_text }}
+                    </p>
 
-                <p>
-                    {{ recommendation.recommendation_text }}
-                </p>
+                </div>
 
             {% endif %}
 
         </section>
 
 
-        <footer class="print-document__footer">
+        <footer class="recommendation-signatures">
 
-            <div>
-                التاريخ:
-                {{ case.committee_session.session_date }}
+            <div class="recommendation-signature">
+
+                <div class="recommendation-signature__title">
+                    مقرر اللجنة
+                </div>
+
+                <div class="recommendation-signature__line">
+                    ................................
+                </div>
+
             </div>
 
-            <div>
-                توقيع اللجنة
-            </div>
+        </footer>
+
+
+        <footer class="print-footer">
+
+            <span>
+                نظام اللجنة الطبية
+            </span>
 
         </footer>
 
     </main>
 
-</div>
-
-</body>
+</main>
 
 {% endblock %}

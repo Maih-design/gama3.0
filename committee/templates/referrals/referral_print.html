@@ -42,7 +42,7 @@
     </div>
 
 
-    <div class="print-toolbar__actions">
+    <div class="print-toolbar__actions no-print">
 
         <a
             href="{% url 'session_detail' referral.committee_case.committee_session.pk %}"
@@ -54,7 +54,7 @@
         <button
             type="button"
             onclick="window.print()"
-            class="print-btn print-btn--primary"
+            class="print-btn print-btn--primary no-print"
         >
             طباعة الخطاب
         </button>
@@ -83,6 +83,9 @@
 
                 <div>
                     الإدارة العامة للخدمات الطبية
+                </div>
+                <div>
+                    اللجنة العليا للجاما نايف
                 </div>
 
             </div>
@@ -248,13 +251,12 @@
 
                 {% if referral.committee_case.recommendation.procedure.category == "جراحة إشعاعية" %}
 
-                    إجراء
-                    {{ referral.committee_case.recommendation.no_of_sessions }}
-                    جلسات
-                    {{ referral.committee_case.recommendation.procedure.name }}
-                    بتكلفة
-                    {{ referral.committee_case.recommendation.procedure.price_in_words }}
-                    طبقًا لسعر اللائحة.
+        
+                    {{ referral.committee_case.recommendation.procedure }} 
+                    بواقع {{ referral.committee_case.recommendation.no_of_sessions }} 
+                    جلسات بعد موافقة السلطة المختصة بإدراج الخدمة بتكلفة ({{ referral.committee_case.recommendation.procedure.price }}) 
+                    {{ referral.committee_case.recommendation.procedure.price_in_words }} لا غير. 
+            
 
                 {% else %}
 
@@ -263,20 +265,6 @@
                 {% endif %}
 
             </div>
-
-
-            {% if referral.committee_case.recommendation.no_of_sessions %}
-
-                <div class="prnt-procedure-box__sessions">
-
-                    عدد الجلسات:
-                    <strong>
-                        {{ referral.committee_case.recommendation.no_of_sessions }}
-                    </strong>
-
-                </div>
-
-            {% endif %}
 
         </section>
 

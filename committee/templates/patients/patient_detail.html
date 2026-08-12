@@ -13,7 +13,7 @@
 
 <body>
 
-<div class="page">
+<div class="page-content">
 
     <header class="page-header">
 
@@ -179,8 +179,7 @@
 
         </section>
 
-
-        <!-- Patient History -->
+        <!-- Patient Committee History -->
 
         <section class="page-section patient-history-section">
 
@@ -193,90 +192,202 @@
             </div>
 
 
-            {% if patient.committee_cases %}
+            {% if patient.committee_cases.all %}
 
-                <div class="patient-history">
+                <div class="data-table__wrapper">
 
-                    {% for case in patient.committee_cases.all %}
+                    <table class="data-table patient-history-table">
 
-                        <article class="patient-history__item">
+                        <thead class="data-table__head">
 
-                            <div class="patient-history__date">
+                            <tr>
 
-                                {{ case.committee_session.session_date|date:"Y-m-d" }}
+                                <th>#</th>
 
-                            </div>
+                                <th>تاريخ الجلسة</th>
 
+                                <th>الطبيب</th>
 
-                            <div class="patient-history__doctor">
+                                <th>حالة العرض</th>
 
-                                الطبيب:
-                                {{ case.committee_session.doctor.full_name }}
+                                <th>الإجراء</th>
 
-                            </div>
+                                <th>عدد الجلسات</th>
 
+                                <th>قرار اللجنة</th>
 
-                            <div class="patient-history__diagnosis">
+                                <th>خطاب التحويل</th>
 
-                                التشخيص:
-                                {{ patient.diagnosis }}
+                            </tr>
 
-                            </div>
-
-
-                            <div class="patient-history__recommendation">
-
-                                {% if case.recommendation %}
-
-                                    <strong>
-                                        التوصية:
-                                    </strong>
-
-                                    {{ case.recommendation.recommendation_text }}
-
-                                {% else %}
-
-                                    <span class="status status-pending">
-                                        لم تصدر توصية بعد
-                                    </span>
-
-                                {% endif %}
-
-                            </div>
+                        </thead>
 
 
-                            {% if case.recommendation %}
+                        <tbody class="data-table__body">
 
-                                <div class="patient-history__procedure">
+                            {% for case in patient.committee_cases.all %}
 
-                                    الإجراء:
-                                    {{ case.recommendation.procedure.name }}
+                                <tr class="data-table__row">
 
-                                </div>
+                                    <!-- # -->
 
-                            {% endif %}
+                                    <td class="data-table__cell--number">
+                                        {{ forloop.counter }}
+                                    </td>
 
 
-                            <div class="patient-history__actions">
+                                    <!-- Session Date -->
 
-                                {% if case.recommendation %}
+                                    <td>
 
-                                    <a
-                                        href="{% url 'recommendation_print' case.pk %}"
-                                        class="btn btn-secondary btn-sm"
-                                    >
-                                        عرض القرار
-                                    </a>
+                                        {{ case.committee_session.session_date|date:"Y-m-d" }}
 
-                                {% endif %}
+                                    </td>
 
-                            </div>
 
-                        </article>
+                                    <!-- Doctor -->
 
-                    {% endfor %}
+                                    <td>
+
+                                        {{ case.committee_session.doctor.full_name }}
+
+                                    </td>
+
+
+                                    <!-- Case Status -->
+
+                                    <td class="data-table__cell--status">
+
+                                        <span class="status">
+
+                                            {{ case.get_status_display }}
+
+                                        </span>
+
+                                    </td>
+
+
+                                    <!-- Procedure -->
+
+                                    <td>
+
+                                        {% if case.recommendation %}
+
+                                            {{ case.recommendation.procedure.name }}
+
+                                        {% else %}
+
+                                            <span>
+                                                -
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <!-- Number of Sessions -->
+
+                                    <td>
+
+                                        {% if case.recommendation.no_of_sessions %}
+
+                                            {{ case.recommendation.no_of_sessions }}
+
+                                        {% else %}
+
+                                            -
+                                            
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <!-- Recommendation -->
+
+                                    <td class="data-table__cell--actions">
+
+                                        {% if case.recommendation %}
+
+                                            <div class="table-actions">
+
+                                                <a
+                                                    href="{% url 'recommendation_print' case.pk %}"
+                                                    class="btn btn-secondary btn-sm"
+                                                >
+                                                    عرض القرار
+                                                </a>
+
+                                            </div>
+
+                                        {% else %}
+
+                                            <span class="status status-pending">
+                                                لم يصدر
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <!-- Referral -->
+
+                                    <td class="data-table__cell--actions">
+
+                                        {% with referral=case.referrals.first %}
+
+                                            {% if referral %}
+
+                                                <div class="table-actions">
+
+                                                    <a
+                                                        href="{% url 'referral_print' referral.pk %}"
+                                                        class="btn btn-secondary btn-sm"
+                                                    >
+                                                        عرض
+                                                    </a>
+
+
+                                                    <a
+                                                        href="{% url 'referral_update' referral.pk %}"
+                                                        class="btn btn-primary btn-sm"
+                                                    >
+                                                        تعديل
+                                                    </a>
+
+
+                                                    <a
+                                                        href="{% url 'referral_cancel' referral.pk %}"
+                                                        class="btn btn-danger btn-sm"
+                                                    >
+                                                        إلغاء
+                                                    </a>
+
+                                                </div>
+
+                                            {% else %}
+
+                                                <span class="status status-pending">
+                                                    لا يوجد خطاب
+                                                </span>
+
+                                            {% endif %}
+
+                                        {% endwith %}
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
 
                 </div>
+
 
             {% else %}
 
