@@ -1,7 +1,15 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block title %}
     الرئيسية - نظام اللجنة العليا للجاما نايف
+{% endblock %}
+{% block extra_css %}
+
+<link
+    rel="stylesheet"
+    href="{% static 'css/home.css' %}"
+>
+
 {% endblock %}
 
 
@@ -29,7 +37,7 @@
 
     <section class="dashboard home-dashboard">
 
-        <div class="dashboard-grid">
+        <div class="home-grid">
 
             <a
                 href="{% url 'patient_list' %}"

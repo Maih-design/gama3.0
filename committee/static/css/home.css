@@ -1,0 +1,241 @@
+/* =========================================================
+   HOME PAGE
+   Page-specific styles only
+   ========================================================= */
+
+
+/* =========================
+   Home Layout
+   ========================= */
+
+.home-page {
+    max-width: 100%;
+    margin: 0 0;
+    padding: 3rem 2rem;
+    background-image: url("../images/background.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+
+/* =========================
+   Home Header
+   ========================= */
+
+.home-page .page-header {
+    margin-bottom: 2.5rem;
+}
+
+.home-page .page-title {
+    margin-bottom: 0.5rem;
+    color:#ecfdf5
+}
+
+.home-page .page-subtitle {
+    margin: 0;
+    color:#ecfdf5
+
+}
+
+
+/* =========================
+   Home Cards Grid
+   ========================= */
+
+.home-grid {
+    display: grid;
+
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 1.5rem;
+
+    width: 100%;
+}
+
+
+/* =========================
+   Home Card
+   ========================= */
+
+.home-card {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 230px;
+
+    padding: 2rem 1.5rem;
+
+    box-sizing: border-box;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    text-align: center;
+
+    text-decoration: none;
+
+    color: #1f2937;
+
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.05);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease,
+        background-color 0.2s ease;
+}
+
+
+/* =========================
+   Card Hover
+   ========================= */
+
+.home-card:hover {
+    transform: translateY(-5px);
+
+    border-color: #a7d9c8;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 12px 28px rgba(0, 0, 0, 0.09);
+
+    text-decoration: none;
+}
+
+
+/* =========================
+   Card Active / Click
+   ========================= */
+
+.home-card:active {
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 5px 12px rgba(0, 0, 0, 0.07);
+}
+
+
+/* =========================
+   Card Icon
+   ========================= */
+
+.home-card__icon {
+    width: 64px;
+
+    height: 64px;
+
+    margin-bottom: 1.25rem;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #ecfdf5;
+
+    color: #047857;
+
+    font-size: 1.8rem;
+
+    transition:
+        transform 0.2s ease,
+        background-color 0.2s ease;
+}
+
+
+.home-card:hover .home-card__icon {
+    transform: scale(1.06);
+
+    background: #d1fae5;
+}
+
+
+/* =========================
+   Card Title
+   ========================= */
+
+.home-card h2 {
+    margin: 0 0 0.6rem;
+
+    font-size: 1.15rem;
+
+    font-weight: 700;
+
+    color: #1f2937;
+}
+
+
+/* =========================
+   Card Description
+   ========================= */
+
+.home-card p {
+    max-width: 260px;
+
+    margin: 0;
+
+    font-size: 0.88rem;
+
+    line-height: 1.7;
+
+    color: #6b7280;
+}
+
+
+/* =========================
+   Responsive
+   ========================= */
+
+@media (max-width: 850px) {
+
+    .home-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .home-page {
+        padding: 2rem 1rem;
+    }
+
+    .home-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .home-card {
+        min-height: 200px;
+    }
+
+}
+
+/* Force home cards to appear horizontally */
+.home-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 1.5rem !important;
+    width: 100% !important;
+    align-items: stretch;
+}
+
+.home-card {
+    display: flex !important;
+    width: 100% !important;
+    box-sizing: border-box;
+}
