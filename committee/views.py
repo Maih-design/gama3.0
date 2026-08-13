@@ -668,3 +668,24 @@ def session_complete(request, pk):
         "session_detail",
         pk=session.pk
     )
+
+@login_required
+def referrals_history(request):
+
+    referrals = (
+        Referral.objects
+        .select_related(
+            "committee_case__patient",
+            "committee_case__committee_session",
+            "committee_case__recommendation__procedure",
+        )
+        .order_by("-created_at")
+    )
+
+    return render(
+        request,
+        "referrals/pending_referrals.html",
+        {
+            "referrals": referrals,
+        }
+    )

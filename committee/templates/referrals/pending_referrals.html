@@ -192,8 +192,156 @@
 
 
         </section>
+        <section class="referral-history">
+
+            <div class="data-table__wrapper">
+
+                <table class="data-table referral-history-table">
+
+                    <thead class="data-table__head">
+
+                        <tr>
+
+                            <th>#</th>
+
+                            <th>اسم المريض</th>
+
+                            <th>الرقم القومي</th>
+
+                            <th>الإجراء الطبي</th>
+
+                            <th>جلسة اللجنة</th>
+
+                            <th>تاريخ إصدار الخطاب</th>
+
+                            <th>جهة التحويل</th>
+
+                            <th>حالة الخطاب</th>
+
+                            <th>إجراءات</th>
+
+                        </tr>
+
+                    </thead>
 
 
+                    <tbody class="data-table__body">
+
+                        {% for referral in referrals %}
+
+                            <tr class="data-table__row">
+
+                                <td class="data-table__cell--number">
+                                    {{ forloop.counter }}
+                                </td>
+
+
+                                <td class="patient-name">
+                                    {{ referral.committee_case.patient.full_name }}
+                                </td>
+
+
+                                <td class="patient-national-id">
+                                    {{ referral.committee_case.patient.national_id }}
+                                </td>
+
+
+                                <td>
+                                    {{ referral.committee_case.recommendation.procedure.name }}
+
+                                    {% if referral.committee_case.recommendation.no_of_sessions %}
+                                        <br>
+                                        <small>
+                                            {{ referral.committee_case.recommendation.no_of_sessions }}
+                                            جلسات
+                                        </small>
+                                    {% endif %}
+                                </td>
+
+
+                                <td class="session-date">
+                                    {{ referral.committee_case.committee_session.session_date|date:"Y-m-d" }}
+                                </td>
+
+
+                                <td class="referral-date">
+                                    {{ referral.created_at|date:"Y-m-d" }}
+                                </td>
+
+
+                                <td class="referral-center">
+                                    {{ referral.referral_center }}
+                                </td>
+
+
+                                <td class="data-table__cell--status">
+
+                                    <span class="status status-{{ referral.status|lower }}">
+                                        {{ referral.get_status_display }}
+                                    </span>
+
+                                </td>
+
+
+                                <td class="data-table__cell--actions">
+
+                                    <div class="table-actions">
+
+                                        <a
+                                            href="{% url 'referral_detail' referral.pk %}"
+                                            class="btn btn-secondary btn-sm"
+                                        >
+                                            عرض
+                                        </a>
+
+
+                                        <a
+                                            href="{% url 'referral_print' referral.pk %}"
+                                            class="btn btn-primary btn-sm"
+                                        >
+                                            طباعة
+                                        </a>
+
+
+                                        {% if referral.status != "cancelled" %}
+
+                                            <a
+                                                href="{% url 'referral_update' referral.pk %}"
+                                                class="btn btn-outline btn-sm"
+                                            >
+                                                تعديل
+                                            </a>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        {% empty %}
+
+                            <tr class="data-table__row">
+
+                                <td
+                                    colspan="9"
+                                    class="table-empty"
+                                >
+                                    لا توجد خطابات حتى الآن.
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
     </main>
 
 </div>

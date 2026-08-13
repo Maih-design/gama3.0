@@ -9,13 +9,15 @@
    ========================= */
 
 .home-page {
+    min-height: calc(100vh - 72px);
     max-width: 100%;
     margin: 0 0;
     padding: 3rem 2rem;
     background-image: url("../images/background.png");
     background-size: cover;
-    background-position: center;
+    background-position: center center;
     background-repeat: no-repeat;
+    box-sizing: border-box;
 }
 
 
@@ -28,11 +30,13 @@
 }
 
 .home-page .page-title {
+    font-size: 2rem;
     margin-bottom: 0.5rem;
-    color:#ecfdf5
+    color:white
 }
 
 .home-page .page-subtitle {
+    font-size: 1.5rem;
     margin: 0;
     color:#ecfdf5
 
@@ -51,6 +55,13 @@
     gap: 1.5rem;
 
     width: 100%;
+    margin-top: 3rem;
+}
+
+@media (min-height: 900px) {
+    .home-grid {
+        margin-top: 7rem;
+    }
 }
 
 
@@ -59,6 +70,11 @@
    ========================= */
 
 .home-card {
+    position: relative;
+
+    margin-top: 70px;
+
+    overflow: visible;
     display: flex;
 
     flex-direction: column;
@@ -69,11 +85,11 @@
 
     min-height: 230px;
 
-    padding: 2rem 1.5rem;
+    padding: 3rem 1.5rem;
 
     box-sizing: border-box;
 
-    background: #ffffff;
+    background: white;
 
     border: 1px solid #e5e7eb;
 
@@ -130,37 +146,38 @@
    Card Icon
    ========================= */
 
-.home-card__icon {
-    width: 64px;
+.home-card__image {
+    position: absolute;
 
-    height: 64px;
+    top: -110px;
+    left: 50%;
 
-    margin-bottom: 1.25rem;
+    transform: translateX(-50%);
+
+    width: 280px;
+    height: 200px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
-    border-radius: 50%;
-
-    background: #ecfdf5;
-
-    color: #047857;
-
-    font-size: 1.8rem;
-
-    transition:
-        transform 0.2s ease,
-        background-color 0.2s ease;
+    z-index: 2;
 }
 
+.home-card__image img {
+    width: 100%;
+    height: 100%;
 
-.home-card:hover .home-card__icon {
-    transform: scale(1.06);
+    object-fit: contain;
 
-    background: #d1fae5;
+    display: block;
+
+    transition:
+        transform 0.25s ease;
+}
+
+.home-card:hover .home-card__image img {
+    transform: translateY(-5px) scale(1.03);
 }
 
 
@@ -171,11 +188,11 @@
 .home-card h2 {
     margin: 0 0 0.6rem;
 
-    font-size: 1.15rem;
+    font-size: 2.5rem;
 
     font-weight: 700;
 
-    color: #1f2937;
+    color: #149463;
 }
 
 
@@ -188,12 +205,13 @@
 
     margin: 0;
 
-    font-size: 0.88rem;
+    font-size: 1rem;
 
     line-height: 1.7;
 
-    color: #6b7280;
+    color: #149463;
 }
+
 
 
 /* =========================
@@ -225,17 +243,4 @@
 
 }
 
-/* Force home cards to appear horizontally */
-.home-grid {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 1.5rem !important;
-    width: 100% !important;
-    align-items: stretch;
-}
-
-.home-card {
-    display: flex !important;
-    width: 100% !important;
-    box-sizing: border-box;
-}
+    
