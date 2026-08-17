@@ -1,11 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="page-content">
 <header class="section-header">
-
-    <h2 class="section-title">
-        حالات الجلسة
-    </h2>
 
     <div class="section-header__actions">
 
@@ -127,67 +124,116 @@
     <header class="section-header">
 
         <h2 class="section-title">
-            حالات الجلسة
+            الحالات المعروضة على اللجنة في الجلسة
         </h2>
 
     </header>
 
 
-    <div class="cases-list">
+    <div class="data-table__wrapper">
 
-        {% for case in session.cases.all %}
+        <table class="data-table">
 
-            <article class="case-card">
+            <thead class="data-table__head">
 
-                <div class="case-card__info">
+                <tr>
 
-                    <h3 class="case-card__name">
-                        {{ case.patient.full_name }}
-                    </h3>
+                    <th>#</th>
+
+                    <th>
+                        اسم المريض
+                    </th>
+
+                    <th>
+                        الرقم القومي
+                    </th>
+
+                    <th>
+                        التشخيص
+                    </th>
+
+                    <th>
+                        الفرع التابع له
+                    </th>
+
+                    <th>
+                        الحالة
+                    </th>
+
+                    <th>
+                        قرار اللجنة
+                    </th>
+
+                </tr>
+
+            </thead>
 
 
-                    <div class="case-card__field">
+            <tbody>
 
-                        <span class="case-card__label">
-                            الرقم القومي
-                        </span>
+                {% for case in session.cases.all %}
 
-                        <span class="case-card__value">
+                    <tr class="data-table__row">
+
+                        <td class="data-table__cell data-table__cell--number">
+                            {{ forloop.counter }}
+                        </td>
+
+
+                        <td class="data-table__cell">
+                            {{ case.patient.full_name }}
+                        </td>
+
+
+                        <td class="data-table__cell">
                             {{ case.patient.national_id }}
-                        </span>
-
-                    </div>
+                        </td>
 
 
-                    <div class="case-card__field">
+                        <td class="data-table__cell">
+                            {{ case.patient.diagnosis }}
+                        </td>
 
-                        <span class="case-card__label">
-                            الحالة
-                        </span>
 
-                        <span class="case-card__value">
+                        <td class="data-table__cell">
+                            {{ case.patient.affiliated_branch }}
+                        </td>
+
+
+                        <td class="data-table__cell">
                             {{ case.get_status_display }}
-                        </span>
+                        </td>
 
-                    </div>
 
-                </div>
+                        <td class="data-table__cell committee-decision-cell">
+                            {% if case.recommendation %}
+                                {{ case.recommendation.procedure }}
+                            {% endif %}
+                        </td>
 
-            </article>
+                    </tr>
 
-        {% empty %}
+                {% empty %}
 
-            <div class="empty-state">
+                    <tr class="data-table__row">
 
-                <p class="empty-state__text">
-                    لا توجد حالات مضافة إلى هذه الجلسة.
-                </p>
+                        <td
+                            colspan="7"
+                            class="data-table__cell table-empty"
+                        >
+                            لا توجد حالات مضافة إلى هذه الجلسة.
+                        </td>
 
-            </div>
+                    </tr>
 
-        {% endfor %}
+                {% endfor %}
+
+            </tbody>
+
+        </table>
 
     </div>
 
 </section>
+</div>
 {% endblock %}

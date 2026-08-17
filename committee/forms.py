@@ -66,6 +66,20 @@ class PatientForm(forms.ModelForm):
                 }
             ),
         }
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field in self.fields.values():
+
+            if isinstance(field.widget, forms.Select):
+                field.widget.attrs["class"] = "form-select"
+
+            elif isinstance(field.widget, forms.Textarea):
+                field.widget.attrs["class"] = "form-textarea"
+
+            else:
+                field.widget.attrs["class"] = "form-input"
 
 
 class ProcedureForm(forms.ModelForm):
@@ -129,6 +143,13 @@ class CommitteeSessionForm(forms.ModelForm):
             "session_date": forms.DateInput(
                 attrs={
                     "type": "date",
+                    "class": "form-input",
+                }
+            ),
+
+            "doctor": forms.Select(
+                attrs={
+                    "class": "form-select",
                 }
             ),
         }

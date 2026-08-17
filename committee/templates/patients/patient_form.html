@@ -93,7 +93,9 @@
 
                             <div class="form-field">
 
-                                {{ field.label_tag }}
+                                <label class="form-label" for="{{ field.id_for_label }}">
+                                    {{ field.label }}
+                                </label>
 
                                 {{ field }}
 

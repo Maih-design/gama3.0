@@ -13,7 +13,7 @@
 
     <link
         rel="stylesheet"
-        href="{% static 'css/main.css' %}"
+        href="{% static 'css/print.css' %}"
     >
 
     <style>
@@ -33,7 +33,7 @@
 
 <body>
 
-<div class="page">
+<div class="page page-content">
 
     <div class="print-actions">
 
@@ -49,11 +49,32 @@
 
     <main class="print-document">
 
-        <header class="print-document__header">
+        <header class="print-header page-header">
 
-            <h1>
-                محضر جلسة اللجنة الطبية
-            </h1>
+            <div class="print-header__right">
+
+                <div class="print-header__organization">
+                    <div>الإدارة العامة للخدمات الطبية</div>
+                    <div>اللجنة العليا للجاما نايف</div>
+                </div>
+
+            </div>
+
+
+            <div class="print-header__center">
+
+                <img
+                    src="{% static 'images/logo.png' %}"
+                    alt="شعار النظام"
+                    class="navbar__logo"
+                >
+
+            </div>
+        </header>
+
+            <h2 class="print-title">
+                محضر جلسة اللجنة
+            </h2>
 
             <p>
                 تاريخ الجلسة:
@@ -64,8 +85,6 @@
                 الطبيب الاستشاري:
                 {{ session.doctor.full_name }}
             </p>
-
-        </header>
 
 
         <section class="print-document__section">
@@ -92,7 +111,11 @@
                         </th>
 
                         <th>
-                            الإجراء
+                            التشخيص
+                        </th>
+
+                        <th>
+                            قرار اللجنة
                         </th>
 
                         <th>
@@ -100,7 +123,7 @@
                         </th>
 
                         <th>
-                            توصية اللجنة
+                            ملاحظات
                         </th>
 
                     </tr>
@@ -118,36 +141,42 @@
                                 {{ forloop.counter }}
                             </td>
 
+
                             <td>
                                 {{ case.patient.full_name }}
                             </td>
+
 
                             <td>
                                 {{ case.patient.national_id }}
                             </td>
 
+
                             <td>
-                                {{ case.recommendation.procedure }}
+                                {{ case.patient.diagnosis }}
                             </td>
+
+                            <td>
+
+                                {% if case.recommendation %}
+                                    {{ case.recommendation.procedure }}
+                                {% endif %}
+
+                            </td>
+
 
                             <td>
 
                                 {% if case.recommendation.no_of_sessions %}
                                     {{ case.recommendation.no_of_sessions }}
-                                {% else %}
-                                    -
                                 {% endif %}
 
                             </td>
 
-                            <td>
 
-                                {% if case.recommendation.recommendation_text %}
-                                    {{ case.recommendation.recommendation_text }}
-                                {% else %}
-                                    -
-                                {% endif %}
+                            <!-- خانة فارغة للكتابة اليدوية -->
 
+                            <td class="handwritten-notes-cell">
                             </td>
 
                         </tr>
@@ -162,13 +191,13 @@
 
 
         <footer class="print-document__footer">
-
+            <br>
             <div>
-                توقيع الطبيب الاستشاري
+                توقيع الطبيب الاستشاري:
             </div>
-
+            <br><br>
             <div>
-                مقرر اللجنة
+                مقرر اللجنة:
             </div>
 
         </footer>
