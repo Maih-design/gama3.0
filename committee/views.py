@@ -326,13 +326,24 @@ def pending_referrals(request):
         )
     )
 
-    return render(
-        request,
-        "referrals/pending_referrals.html",
-        {
-            "pending_cases": pending_cases,
-        }
+    referrals = (
+    Referral.objects
+    .select_related(
+        "committee_case__patient",
+        "committee_case__committee_session",
+        "committee_case__recommendation__procedure",
     )
+    .order_by("-issued_at")
+)
+
+    return render(
+    request,
+    "referrals/pending_referrals.html",
+    {
+        "pending_cases": pending_cases,
+        "referrals": referrals,
+    }
+)
     
 @login_required
 def referral_create(request, case_pk):
@@ -669,23 +680,3 @@ def session_complete(request, pk):
         pk=session.pk
     )
 
-@login_required
-def referrals_history(request):
-
-    referrals = (
-        Referral.objects
-        .select_related(
-            "committee_case__patient",
-            "committee_case__committee_session",
-            "committee_case__recommendation__procedure",
-        )
-        .order_by("-created_at")
-    )
-
-    return render(
-        request,
-        "referrals/pending_referrals.html",
-        {
-            "referrals": referrals,
-        }
-    )
