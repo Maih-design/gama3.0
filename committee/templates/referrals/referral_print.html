@@ -1,344 +1,329 @@
 {% extends "base.html" %}
 
 {% load static %}
+{% block extra_css %}
 
+<link
+    rel="stylesheet"
+    href="{% static 'css/referral_print.css' %}"
+>
+
+{% endblock %}
 {% block content %}
-
-<head>
-
-    <meta charset="UTF-8">
-
-    <title>
-        خطاب تحويل - {{ referral.committee_case.patient.full_name }}
-    </title>
-
-    <link
-        rel="stylesheet"
-        href="{% static 'css/referral_print.css' %}"
-    >
-
-</head>
-
-
-<body>
-
 
 <!-- =========================
      Screen Controls
 ========================= -->
+<div class="print-page">
+    <div class="no-print print-toolbar">
 
-<div class="no-print print-toolbar">
+        <div class="print-toolbar__info">
 
-    <div class="print-toolbar__info">
+            <span class="print-toolbar__title">
+                شاشة مراجعة خطاب التحويل
+            </span>
 
-        <span class="print-toolbar__title">
-            شاشة مراجعة خطاب التحويل
-        </span>
-
-        <span class="print-toolbar__subtitle">
-            راجع بيانات الخطاب قبل الطباعة.
-        </span>
-
-    </div>
-
-
-    <div class="print-toolbar__actions no-print">
-
-        <a
-            href="{% url 'session_detail' referral.committee_case.committee_session.pk %}"
-            class="print-btn print-btn--secondary"
-        >
-            العودة للجلسة
-        </a>
-
-        <button
-            type="button"
-            onclick="window.print()"
-            class="print-btn print-btn--primary no-print"
-        >
-            طباعة الخطاب
-        </button>
-
-    </div>
-
-</div>
-
-
-
-<!-- =========================
-     Printable Document
-========================= -->
-
-<div class="prnt-page-border">
-
-    <main class="prnt-document">
-
-
-        <!-- Header -->
-
-        <header class="prnt-header">
-
-
-            <div class="prnt-header__right">
-
-                <div>
-                    الإدارة العامة للخدمات الطبية
-                </div>
-                <div>
-                    اللجنة العليا للجاما نايف
-                </div>
-
-            </div>
-
-
-            <div class="prnt-header__logo">
-
-                <img
-                    src="{% static 'images/logo.png' %}"
-                    alt="System Logo"
-                >
-
-            </div>
-
-
-            <div class="prnt-header__left">
-
-                <div>
-                    <strong>رقم الخطاب:</strong>
-                    RF-{{ referral.pk }}
-                </div>
-
-                <div>
-                    <strong>تاريخ الإصدار:</strong>
-                    {{ referral.issued_at|date:"Y-m-d" }}
-                </div>
-
-                <div>
-                    <strong>وقت الإصدار:</strong>
-                    {{ referral.issued_at|date:"H:i" }}
-                </div>
-
-            </div>
-
-        </header>
-
-
-
-        <!-- Title -->
-
-        <h1 class="prnt-title">
-            خطاب تحويل طبي
-        </h1>
-
-
-
-        <!-- Recipient -->
-
-        <div class="prnt-direction-text">
-                السيد الدكتور / مدير وحدة الجاما نايف والتابعة لمستشفى  {{ referral.referral_center }} ،،
-            </div>
-
-
-
-        <!-- Introduction -->
-
-        <div class="prnt-introduction">
-
-            نرجو التكرم باتخاذ اللازم نحو تقديم الخدمة الطبية
-            للمريض الموضح بياناته أدناه:
-
-        </div>
-
-
-
-        <!-- Patient Information -->
-
-        <section class="prnt-grid">
-
-
-            <div class="prnt-field">
-
-                <span class="prnt-field__label">
-                    اسم المريض:
-                </span>
-
-                <span class="prnt-field__value">
-                    {{ referral.committee_case.patient.full_name }}
-                </span>
-
-            </div>
-
-
-            <div class="prnt-field">
-
-                <span class="prnt-field__label">
-                    الرقم القومي:
-                </span>
-
-                <span
-                    class="prnt-field__value prnt-national-id"
-                >
-                    {{ referral.committee_case.patient.national_id }}
-                </span>
-
-            </div>
-
-
-            <div class="prnt-field">
-
-                <span class="prnt-field__label">
-                    الرقم التأميني:
-                </span>
-
-                <span class="prnt-field__value">
-                    {{ referral.committee_case.patient.insurance_number|default:"-" }}
-                </span>
-
-            </div>
-
-
-            <div class="prnt-field">
-
-                <span class="prnt-field__label">
-                    القانون:
-                </span>
-
-                <span class="prnt-field__value">
-                    {{ referral.committee_case.patient.get_insurance_law_display }}
-                </span>
-
-            </div>
-
-
-            <div class="prnt-field">
-
-                <span class="prnt-field__label">
-                    الفرع التابع:
-                </span>
-
-                <span class="prnt-field__value">
-                    {{ referral.committee_case.patient.get_affiliated_branch_display }}
-                </span>
-
-            </div>
-
-            <div class="prnt-field">
-
-                <span class="prnt-field__label">
-                    التشخيص:
-                </span>
-
-                <span class="prnt-field__value">
-                    {{ referral.committee_case.patient.diagnosis }}
-                </span>
-
-            </div>
-
-
-        </section>
-
-
-        <!-- Procedure -->
-
-        <section class="prnt-procedure-box">
-
-            <h3 class="prnt-procedure-box__title">
-                الإجراء الطبي المطلوب:
-            </h3>
-
-
-            <div class="prnt-procedure-box__value">
-
-                {% if referral.committee_case.recommendation.procedure.category == "جراحة إشعاعية" %}
-
-        
-                    {{ referral.committee_case.recommendation.procedure }} 
-                    بواقع {{ referral.committee_case.recommendation.no_of_sessions }} 
-                    جلسات بعد موافقة السلطة المختصة بإدراج الخدمة بتكلفة ({{ referral.committee_case.recommendation.procedure.price }}) 
-                    {{ referral.committee_case.recommendation.procedure.price_in_words }} لا غير. 
-            
-
-                {% else %}
-
-                    {{ referral.committee_case.recommendation.procedure }}
-
-                {% endif %}
-
-            </div>
-
-        </section>
-
-        <!-- Committee Notes -->
-
-        {% if referral.committee_case.recommendation.recommendation_text %}
-
-            <section class="prnt-block note-block">
-
-                <h3 class="prnt-block__title">
-                    ملاحظات اللجنة:
-                </h3>
-
-                <div class="prnt-block__text">
-
-                    {{ referral.committee_case.recommendation.recommendation_text }}
-
-                </div>
-
-            </section>
-
-        {% endif %}
-
-
-
-        <!-- Closing -->
-
-        <div class="prnt-closing">
-            <p> وطبقا للتعاقد المبرم بين الهيئة والمستشفى</p>
-            <p>وعلى أن ترسل المطالبة المالية للمراجعة الفنية والسداد و خصما على حساب رئاسة الهيئة</p>
-            <p>وتفضلوا بقبول وافر الاحترام والتقدير ،،</p>
-        </div>
-
-
-
-        <!-- Signature -->
-
-        <footer class="prnt-signatures">
-
-            <div class="prnt-signature-block">
-
-                <div class="prnt-signature-block__title">
-                    مدير الإدارة العامة للخدمات الطبية
-                </div>
-
-                <div class="prnt-signature-block__space"></div>
-
-                <div class="prnt-signature-block__line">
-                    ............................
-                </div>
-
-            </div>
-
-        </footer>
-
-
-
-        <!-- Footer -->
-
-        <div class="prnt-footer-user">
-
-            <span>
-                الموظف المسؤول:
-                {{ request.user.get_full_name|default:request.user.username }}
+            <span class="print-toolbar__subtitle">
+                راجع بيانات الخطاب قبل الطباعة.
             </span>
 
         </div>
 
 
-    </main>
+        <div class="print-toolbar__actions no-print">
 
+            <a
+                href="{% url 'session_detail' referral.committee_case.committee_session.pk %}"
+                class="print-btn print-btn--secondary"
+            >
+                العودة للجلسة
+            </a>
+
+            <button
+                type="button"
+                onclick="window.print()"
+                class="print-btn print-btn--primary no-print"
+            >
+                طباعة الخطاب
+            </button>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================
+        Printable Document
+    ========================= -->
+
+    <div class="prnt-page-border">
+
+        <main class="prnt-document">
+
+
+            <!-- Header -->
+
+            <header class="prnt-header">
+
+
+                <div class="prnt-header__right">
+
+                    <div>
+                        الإدارة العامة للخدمات الطبية
+                    </div>
+                    <div>
+                        اللجنة العليا للجاما نايف
+                    </div>
+
+                </div>
+
+
+                <div class="prnt-header__logo">
+
+                    <img
+                        src="{% static 'images/logo.png' %}"
+                        alt="System Logo"
+                    >
+
+                </div>
+
+
+                <div class="prnt-header__left">
+
+                    <div>
+                        <strong>رقم الخطاب:</strong>
+                        RF-{{ referral.pk }}
+                    </div>
+
+                    <div>
+                        <strong>تاريخ الإصدار:</strong>
+                        {{ referral.issued_at|date:"Y-m-d" }}
+                    </div>
+
+                    <div>
+                        <strong>وقت الإصدار:</strong>
+                        {{ referral.issued_at|date:"H:i" }}
+                    </div>
+
+                </div>
+
+            </header>
+
+
+
+            <!-- Title -->
+
+            <h1 class="prnt-title">
+                خطاب تحويل طبي
+            </h1>
+
+
+
+            <!-- Recipient -->
+
+            <div class="prnt-direction-text">
+                    السيد الدكتور / مدير وحدة الجاما نايف والتابعة لمستشفى  {{ referral.referral_center }} ،،
+                </div>
+
+
+
+            <!-- Introduction -->
+
+            <div class="prnt-introduction">
+
+                نرجو التكرم باتخاذ اللازم نحو تقديم الخدمة الطبية
+                للمريض الموضح بياناته أدناه:
+
+            </div>
+
+
+
+            <!-- Patient Information -->
+
+            <section class="prnt-grid">
+
+
+                <div class="prnt-field">
+
+                    <span class="prnt-field__label">
+                        اسم المريض:
+                    </span>
+
+                    <span class="prnt-field__value">
+                        {{ referral.committee_case.patient.full_name }}
+                    </span>
+
+                </div>
+
+
+                <div class="prnt-field">
+
+                    <span class="prnt-field__label">
+                        الرقم القومي:
+                    </span>
+
+                    <span
+                        class="prnt-field__value prnt-national-id"
+                    >
+                        {{ referral.committee_case.patient.national_id }}
+                    </span>
+
+                </div>
+
+
+                <div class="prnt-field">
+
+                    <span class="prnt-field__label">
+                        الرقم التأميني:
+                    </span>
+
+                    <span class="prnt-field__value">
+                        {{ referral.committee_case.patient.insurance_number|default:"-" }}
+                    </span>
+
+                </div>
+
+
+                <div class="prnt-field">
+
+                    <span class="prnt-field__label">
+                        القانون:
+                    </span>
+
+                    <span class="prnt-field__value">
+                        {{ referral.committee_case.patient.get_insurance_law_display }}
+                    </span>
+
+                </div>
+
+
+                <div class="prnt-field">
+
+                    <span class="prnt-field__label">
+                        الفرع التابع:
+                    </span>
+
+                    <span class="prnt-field__value">
+                        {{ referral.committee_case.patient.get_affiliated_branch_display }}
+                    </span>
+
+                </div>
+
+                <div class="prnt-field">
+
+                    <span class="prnt-field__label">
+                        التشخيص:
+                    </span>
+
+                    <span class="prnt-field__value">
+                        {{ referral.committee_case.patient.diagnosis }}
+                    </span>
+
+                </div>
+
+
+            </section>
+
+
+            <!-- Procedure -->
+
+            <section class="prnt-procedure-box">
+
+                <h3 class="prnt-procedure-box__title">
+                    الإجراء الطبي المطلوب:
+                </h3>
+
+
+                <div class="prnt-procedure-box__value">
+
+                    {% if referral.committee_case.recommendation.procedure.category == "جراحة إشعاعية" %}
+
+            
+                        {{ referral.committee_case.recommendation.procedure }} 
+                        بواقع {{ referral.committee_case.recommendation.no_of_sessions }} 
+                        جلسات بعد موافقة السلطة المختصة بإدراج الخدمة بتكلفة ({{ referral.committee_case.recommendation.procedure.price }}) 
+                        {{ referral.committee_case.recommendation.procedure.price_in_words }} لا غير. 
+                
+
+                    {% else %}
+
+                        {{ referral.committee_case.recommendation.procedure }}
+
+                    {% endif %}
+
+                </div>
+
+            </section>
+
+            <!-- Committee Notes -->
+
+            {% if referral.committee_case.recommendation.recommendation_text %}
+
+                <section class="prnt-block note-block">
+
+                    <h3 class="prnt-block__title">
+                        ملاحظات اللجنة:
+                    </h3>
+
+                    <div class="prnt-block__text">
+
+                        {{ referral.committee_case.recommendation.recommendation_text }}
+
+                    </div>
+
+                </section>
+
+            {% endif %}
+
+
+
+            <!-- Closing -->
+
+            <div class="prnt-closing">
+                <p> وطبقا للتعاقد المبرم بين الهيئة والمستشفى</p>
+                <p>وعلى أن ترسل المطالبة المالية للمراجعة الفنية والسداد و خصما على حساب رئاسة الهيئة</p>
+                <p>وتفضلوا بقبول وافر الاحترام والتقدير ،،</p>
+            </div>
+
+
+
+            <!-- Signature -->
+
+            <footer class="prnt-signatures">
+
+                <div class="prnt-signature-block">
+
+                    <div class="prnt-signature-block__title">
+                        مدير الإدارة العامة للخدمات الطبية
+                    </div>
+
+                    <div class="prnt-signature-block__space"></div>
+
+                    <div class="prnt-signature-block__line">
+                        ............................
+                    </div>
+
+                </div>
+
+            </footer>
+
+
+
+            <!-- Footer -->
+
+            <div class="prnt-footer-user">
+
+                <span>
+                    الموظف المسؤول:
+                    {{ request.user.get_full_name|default:request.user.username }}
+                </span>
+
+            </div>
+
+
+        </main>
+
+    </div>
 </div>
-
-
-</body>
-
 {% endblock %}

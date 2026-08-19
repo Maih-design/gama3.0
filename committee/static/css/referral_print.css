@@ -20,6 +20,10 @@ body {
 /* =========================
    Print Toolbar
 ========================= */
+.print-page {
+    margin: 0;
+    padding: 0;
+}
 
 .print-toolbar {
     background: #ffffff;
@@ -93,23 +97,19 @@ body {
 ========================= */
 
 .prnt-page-border {
-
     width: 210mm;
     min-height: 297mm;
 
-    margin: 2rem auto;
+    margin: 0 auto;
+
+    box-sizing: border-box;
 
     background: #ffffff;
-
     border: 2px solid #000000;
-
     padding: 1cm;
 
     position: relative;
-
-    box-sizing: border-box;
 }
-
 
 .prnt-document {
     width: 100%;
@@ -491,11 +491,23 @@ body {
 @media print {
 
     @page {
-
         size: A4;
         margin: 0;
     }
 
+    .app__content {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        margin: 0 !important;
+    }
+
+    
+
+
+    .print-page {
+    margin: 0;
+    padding: 0;
+    }
 
     html,
     body {
@@ -516,17 +528,20 @@ body {
 
 
     .prnt-page-border {
+    width: 210mm;
+    height: 297mm;
+    min-height: 0 !important;
 
-        width: 210mm;
-        min-height: 297mm;
+    margin: 0 !important;
 
-        margin: 0 !important;
+    box-sizing: border-box;
 
-        border: 2px solid #000000 !important;
+    border: 2px solid #000000 !important;
+    padding: 1cm !important;
 
-        padding: 1cm !important;
+    box-shadow: none !important;
 
-        box-shadow: none !important;
+    overflow: hidden;
     }
 
 
@@ -534,6 +549,8 @@ body {
         width: 100%;
         margin: 0;
         padding: 0;
+
+        min-height: 0 !important;
     }
 
 
@@ -541,15 +558,6 @@ body {
 
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
-    }
-
-    .prnt-signatures,
-    .prnt-signature-block,
-    .prnt-signature-block__title,
-    .prnt-signature-block__space,
-    .prnt-signature-block__line {
-        display: block !important;
-        visibility: visible !important;
     }
 
 }
