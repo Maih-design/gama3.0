@@ -239,11 +239,11 @@
 
                     {% if referral.committee_case.recommendation.procedure.category == "جراحة إشعاعية" %}
 
-            
+                        كورس علاج 
                         {{ referral.committee_case.recommendation.procedure }} 
                         بواقع {{ referral.committee_case.recommendation.no_of_sessions }} 
-                        جلسات بعد موافقة السلطة المختصة بإدراج الخدمة بتكلفة ({{ referral.committee_case.recommendation.procedure.price }}) 
-                        {{ referral.committee_case.recommendation.procedure.price_in_words }} لا غير. 
+                        جلسات بإجمالي تكلفة ({{ referral.committee_case.recommendation.procedure.price }}) 
+                        {{ referral.committee_case.recommendation.procedure.price_in_words }} لا غير وذلك طبقا لموافقة السلطة المختصة بإدراج الخدمة ب {{ referral.committee_case.recommendation.procedure.price }} جنية. 
                 
 
                     {% else %}
