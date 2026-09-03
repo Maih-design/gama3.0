@@ -3,26 +3,44 @@
 {% load static %}
 
 {% block content %}
+
 <head>
+
     <meta charset="UTF-8">
+
     <title>المرضى</title>
 
-    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link
+        rel="stylesheet"
+        href="{% static 'css/main.css' %}"
+    >
+
 </head>
+
 
 <body>
 
 <div class="page page-content">
 
+
+    <!-- =========================
+         Page Header
+    ========================== -->
+
     <header class="page-header">
 
         <div class="page-header__content">
-            <h1 class="page-title">المرضى</h1>
+
+            <h1 class="page-title">
+                المرضى
+            </h1>
 
             <p class="page-subtitle">
                 قائمة المرضى المسجلين بالنظام
             </p>
+
         </div>
+
 
         <div class="page-header__actions">
 
@@ -30,7 +48,8 @@
                 href="{% url 'patient_create' %}"
                 class="btn btn-primary"
             >
-                <b style="font-size: 24px;">+</b>إضافة مريض جديد
+                <b style="font-size: 24px;">+</b>
+                إضافة مريض جديد
             </a>
 
         </div>
@@ -38,17 +57,30 @@
     </header>
 
 
+
+    <!-- =========================
+         Search
+    ========================== -->
+
     <section class="card patient-search">
 
         <div class="card-body">
 
-            <form method="get" class="search" id="patient-search">
+            <form
+                method="get"
+                class="search"
+                id="patient-search"
+            >
 
                 <div class="form-field">
 
-                    <label for="search-input" class="form-label">
+                    <label
+                        for="search-input"
+                        class="form-label"
+                    >
                         بحث عن مريض
                     </label>
+
 
                     <input
                         type="text"
@@ -61,6 +93,7 @@
 
                 </div>
 
+
                 <div class="search__actions">
 
                     <button
@@ -69,6 +102,7 @@
                     >
                         بحث
                     </button>
+
 
                     {% if request.GET.q %}
 
@@ -90,6 +124,11 @@
     </section>
 
 
+
+    <!-- =========================
+         Messages
+    ========================== -->
+
     <main class="page-content">
 
         {% if messages %}
@@ -109,7 +148,13 @@
         {% endif %}
 
 
+
+        <!-- =========================
+             Patients
+        ========================== -->
+
         <section class="page-section patients-section">
+
 
             <div class="page-section__header">
 
@@ -120,7 +165,13 @@
             </div>
 
 
+
             {% if patients %}
+
+
+                <!-- =========================
+                     Patients Table
+                ========================== -->
 
                 <div class="data-table__wrapper">
 
@@ -130,20 +181,37 @@
 
                             <tr>
 
-                                <th>#</th>
+                                <th>
+                                    #
+                                </th>
 
-                                <th>اسم المريض</th>
+                                <th>
+                                    اسم المريض
+                                </th>
 
-                                <th>الرقم القومي</th>
+                                <th>
+                                    الرقم القومي
+                                </th>
 
-                                <th>الفرع</th>
+                                <th>
+                                    الفرع
+                                </th>
 
-                                <th>التشخيص</th>
+                                <th>
+                                    التشخيص
+                                </th>
 
-                                <th>الإجراءات</th>
+                                <th>
+                                    الإجراءات
+                                </th>
+
 
                                 {% if preparing_session %}
-                                    <th>الجلسة المفتوحة</th>
+
+                                    <th>
+                                        الجلسة المفتوحة
+                                    </th>
+
                                 {% endif %}
 
                             </tr>
@@ -151,36 +219,74 @@
                         </thead>
 
 
+
                         <tbody class="data-table__body">
+
 
                             {% for patient in patients %}
 
                                 <tr class="data-table__row">
 
+
+                                    <!-- Number -->
+
                                     <td class="data-table__cell--number">
-                                        {{ forloop.counter }}
+
+                                        {% if is_paginated %}
+
+                                            {{ page_obj.start_index|add:forloop.counter0 }}
+
+                                        {% else %}
+
+                                            {{ forloop.counter }}
+
+                                        {% endif %}
+
                                     </td>
 
+
+
+                                    <!-- Name -->
 
                                     <td class="patient-name">
+
                                         {{ patient.full_name }}
+
                                     </td>
 
+
+
+                                    <!-- National ID -->
 
                                     <td class="patient-national-id">
+
                                         {{ patient.national_id }}
+
                                     </td>
 
+
+
+                                    <!-- Branch -->
 
                                     <td class="patient-branch">
+
                                         {{ patient.get_affiliated_branch_display }}
+
                                     </td>
 
+
+
+                                    <!-- Diagnosis -->
 
                                     <td class="patient-diagnosis">
+
                                         {{ patient.diagnosis }}
+
                                     </td>
 
+
+
+                                    <!-- Actions -->
 
                                     <td class="data-table__cell--actions">
 
@@ -194,35 +300,48 @@
                                     </td>
 
 
+
+                                    <!-- Open Session -->
+
                                     {% if preparing_session %}
 
-                                    <td class="data-table__cell--actions">
-                                        <div class="table-actions">
+                                        <td class="data-table__cell--actions">
 
-                                        {% if patient.id in patients_in_session %}
+                                            <div class="table-actions">
 
-                                            <span class="patient-session-status">
-                                                مضاف للجلسة
-                                            </span>
 
-                                        {% else %}
+                                                {% if patient.id in patients_in_session %}
 
-                                            <a
-                                                href="{% url 'add_patient_to_session' patient.pk %}"
-                                                class="btn btn-primary btn-sm"
-                                            >
-                                                إضافة للجلسة
-                                            </a>
+                                                    <span class="patient-session-status">
 
-                                        {% endif %}
-                                        </div>
-                                    </td>
+                                                        مضاف للجلسة
+
+                                                    </span>
+
+
+                                                {% else %}
+
+                                                    <a
+                                                        href="{% url 'add_patient_to_session' patient.pk %}"
+                                                        class="btn btn-primary btn-sm"
+                                                    >
+                                                        إضافة للجلسة
+                                                    </a>
+
+                                                {% endif %}
+
+
+                                            </div>
+
+                                        </td>
 
                                     {% endif %}
+
 
                                 </tr>
 
                             {% endfor %}
+
 
                         </tbody>
 
@@ -230,38 +349,144 @@
 
                 </div>
 
+
+
+                <!-- =========================
+                     Pagination
+                ========================== -->
+
+                {% if is_paginated %}
+
+                    <div class="pagination">
+
+
+                        {% if page_obj.has_previous %}
+
+                            <a
+                                href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q|urlencode }}{% endif %}"
+                                class="btn btn-secondary btn-sm"
+                            >
+                                السابق
+                            </a>
+
+                        {% endif %}
+
+
+
+                        <span class="pagination__info">
+
+                            صفحة
+                            {{ page_obj.number }}
+                            من
+                            {{ page_obj.paginator.num_pages }}
+
+                        </span>
+
+
+
+                        {% if page_obj.has_next %}
+
+                            <a
+                                href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q|urlencode }}{% endif %}"
+                                class="btn btn-primary btn-sm"
+                            >
+                                التالي
+                            </a>
+
+                        {% endif %}
+
+
+                    </div>
+
+                {% endif %}
+
+
+
             {% else %}
+
+
+                <!-- =========================
+                     Empty State
+                ========================== -->
 
                 <div class="empty-state">
 
+
                     <div class="empty-state__title">
-                        لا يوجد مرضى مسجلون
+
+                        {% if request.GET.q %}
+
+                            لا توجد نتائج للبحث
+
+                        {% else %}
+
+                            لا يوجد مرضى مسجلون
+
+                        {% endif %}
+
                     </div>
 
+
+
                     <div class="empty-state__text">
-                        يمكنك إضافة أول مريض من زر "إضافة مريض جديد".
+
+                        {% if request.GET.q %}
+
+                            لم يتم العثور على مريض يطابق
+                            "{{ request.GET.q }}".
+
+                        {% else %}
+
+                            يمكنك إضافة أول مريض من زر
+                            "إضافة مريض جديد".
+
+                        {% endif %}
+
                     </div>
+
+
 
                     <div class="empty-state__action">
 
-                        <a
-                            href="{% url 'patient_create' %}"
-                            class="btn btn-primary"
-                        >
-                            إضافة مريض جديد
-                        </a>
+
+                        {% if request.GET.q %}
+
+                            <a
+                                href="{% url 'patient_list' %}"
+                                class="btn btn-secondary"
+                            >
+                                عرض جميع المرضى
+                            </a>
+
+                        {% else %}
+
+                            <a
+                                href="{% url 'patient_create' %}"
+                                class="btn btn-primary"
+                            >
+                                إضافة مريض جديد
+                            </a>
+
+                        {% endif %}
+
 
                     </div>
 
+
                 </div>
+
 
             {% endif %}
 
+
         </section>
+
 
     </main>
 
+
 </div>
+
 
 </body>
 
