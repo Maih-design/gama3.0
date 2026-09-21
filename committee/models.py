@@ -10,13 +10,6 @@ from .constants import (
     SessionStatus,
 )
 
-class Diagnosis(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    is_active = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.name
-
 class Patient(models.Model):
     national_id = models.CharField(max_length=14, unique=True)
     full_name = models.CharField(max_length=200)
@@ -26,7 +19,7 @@ class Patient(models.Model):
     phone_number = models.CharField(max_length=20, blank=True)
     affiliated_branch = models.CharField(max_length=100, choices=Branches.choices)
     diagnosis = models.TextField()
-    diagnosis_temp = models.ForeignKey(Diagnosis, on_delete=models.PROTECT, null=True, blank=True)
+ 
 
     def __str__(self):
         return self.full_name
