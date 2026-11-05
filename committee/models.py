@@ -139,6 +139,8 @@ class CommitteeRecommendation(models.Model):
 
 class ReferralCenter(models.Model):
     name = models.CharField(max_length=200, unique=True)
+    for_gamma = models.BooleanField(default=True, verbose_name="لجنة الجاما نايف")
+    for_bone_marrow = models.BooleanField(default=False, verbose_name="لجنة زرع النخاع")
 
     def __str__(self):
         return self.name
