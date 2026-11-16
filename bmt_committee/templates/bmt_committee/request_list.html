@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    قائمة طلبات زرع النخاع و ATG
+{% endblock %}
+
+{% block content %}
+<div class="page page-content">
+
+    <!-- Header -->
+    <header class="page-header">
+        <div class="page-header__content">
+            <h1 class="page-title">
+                طلبات ومذكرات زرع النخاع و ATG
+            </h1>
+            <p class="page-subtitle">
+                استعراض وبحث وفلترة كافة الطلبات والمذكرات المسجلة
+            </p>
+        </div>
+
+        <div class="page-header__actions">
+            <a href="{% url 'bmt_committee:request_create' %}" class="btn btn-primary">
+                <b>+</b> إعداد طلب ومذكرة جديدة
+            </a>
+            <a href="{% url 'bmt_committee:dashboard' %}" class="btn btn-secondary">
+                لوحة المتابعة
+            </a>
+        </div>
+    </header>
+
+    {% if messages %}
+    <div class="messages-container" style="margin-bottom: 1rem;">
+        {% for message in messages %}
+        <div class="alert alert--{{ message.tags|default:'info' }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Filter & Search Bar -->
+    <section class="card" style="margin-bottom: 1.5rem; padding: 1rem 1.5rem;">
+        <form method="get" style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;">
+
+            <div style="flex: 2; min-width: 240px;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: #475569;">
+                    البحث (اسم المريض، الرقم القومي، كود الطلب، رقم الصادر أو الوارد الدفتري)
+                </label>
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ search }}"
+                    class="form-input"
+                    placeholder="اكتب كلمة البحث واضغط Enter..."
+                >
+            </div>
+
+            <div style="flex: 1; min-width: 180px;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: #475569;">
+                    نوع الإجراء
+                </label>
+                <select name="type" class="form-select">
+                    <option value="">-- كافة الإجراءات --</option>
+                    {% for val, label in request_types %}
+                    <option value="{{ val }}" {% if selected_type == val %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="flex: 1; min-width: 180px;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: #475569;">
+                    حالة الطلب
+                </label>
+                <select name="status" class="form-select">
+                    <option value="">-- كافة الحالات --</option>
+                    {% for val, label in request_statuses %}
+                    <option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 0.5rem;">
+                <button type="submit" class="btn btn-primary" style="padding: 0.6rem 1.25rem;">
+                    بحث وتصفية
+                </button>
+                {% if search or selected_type or selected_status %}
+                <a href="{% url 'bmt_committee:request_list' %}" class="btn btn-secondary" style="padding: 0.6rem 1rem;">
+                    إلغاء التصفية
+                </a>
+                {% endif %}
+            </div>
+
+        </form>
+    </section>
+
+    <!-- Table of Requests -->
+    <section class="card">
+        <div class="card-body" style="padding: 0;">
+            <div class="data-table__wrapper">
+                <table class="data-table" style="width: 100%;">
+                    <thead class="data-table__head">
+                        <tr>
+                            <th>كود الطلب</th>
+                            <th>المريض</th>
+                            <th>الرقم القومي</th>
+                            <th>نوع الإجراء</th>
+                            <th>المستشفى</th>
+                            <th>المبلغ المعتمد</th>
+                            <th>الصادر الدفتري</th>
+                            <th>الوارد الدفتري</th>
+                            <th>الحالة</th>
+                            <th>إجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in requests %}
+                        <tr class="data-table__row">
+                            <td class="data-table__cell">
+                                <a href="{% url 'bmt_committee:request_detail' req.pk %}" style="color: #0f766e; font-weight: 700; text-decoration: none;">
+                                    {{ req.request_code }}
+                                </a>
+                            </td>
+                            <td class="data-table__cell">
+                                <strong>{{ req.patient.full_name }}</strong>
+                            </td>
+                            <td class="data-table__cell" style="font-family: monospace; font-size: 0.9rem;">
+                                {{ req.patient.national_id }}
+                            </td>
+                            <td class="data-table__cell" style="font-size: 0.85rem;">
+                                {{ req.get_request_type_display }}
+                            </td>
+                            <td class="data-table__cell" style="font-size: 0.85rem;">
+                                {{ req.hospital.name }}
+                            </td>
+                            <td class="data-table__cell" style="font-weight: 700; color: #047857;">
+                                {{ req.approved_amount|floatformat:2 }} ج.م
+                            </td>
+                            <td class="data-table__cell" style="font-size: 0.85rem;">
+                                {{ req.manual_outgoing_number|default:"-" }}
+                            </td>
+                            <td class="data-table__cell" style="font-size: 0.85rem;">
+                                {{ req.manual_incoming_number|default:"-" }}
+                            </td>
+                            <td class="data-table__cell">
+                                <span class="status {% if req.status == 'APPROVED' or req.status == 'COMPLETED' or req.status == 'LETTER_DELIVERED' %}status-approved{% elif req.status == 'REJECTED' %}status-cancelled{% elif req.status == 'SENT_FOR_APPROVAL' %}status-reviewing{% else %}status-pending{% endif %}">
+                                    {{ req.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="data-table__cell">
+                                <a href="{% url 'bmt_committee:request_detail' req.pk %}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;">
+                                    تفاصيل
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="10" style="text-align: center; padding: 2.5rem; color: #94a3b8;">
+                                لا توجد طلبات مطابقة لمعايير البحث.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="card-footer" style="display: flex; justify-content: center; gap: 0.5rem; padding: 1rem;">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}&search={{ search }}&type={{ selected_type }}&status={{ selected_status }}" class="btn btn-secondary" style="padding: 0.4rem 0.8rem;">
+                السابق
+            </a>
+            {% endif %}
+
+            <span style="display: inline-flex; align-items: center; padding: 0 0.75rem; font-size: 0.9rem; color: #64748b;">
+                صفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&search={{ search }}&type={{ selected_type }}&status={{ selected_status }}" class="btn btn-secondary" style="padding: 0.4rem 0.8rem;">
+                التالي
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </section>
+
+</div>
+{% endblock %}

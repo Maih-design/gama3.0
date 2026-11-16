@@ -1,0 +1,184 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مذكرة عرض {{ request_obj.request_code }} - {{ request_obj.patient.full_name }}</title>
+    <link rel="stylesheet" href="{% static 'css/bmt_print.css' %}">
+</head>
+<body>
+
+    <!-- Print Action Toolbar -->
+    <div class="print-toolbar no-print">
+        <div class="print-toolbar__info">
+            <span class="print-toolbar__title">مذكرة الموافقة المالية الرسمية</span>
+            <span class="print-toolbar__subtitle">
+                طلب: {{ request_obj.request_code }} | المريض: {{ request_obj.patient.full_name }} ({{ request_obj.get_request_type_display }})
+            </span>
+        </div>
+        <div class="print-toolbar__actions">
+            <a href="{% url 'bmt_committee:request_detail' request_obj.pk %}" class="print-btn print-btn--secondary">
+                &rarr; العودة لملف الطلب
+            </a>
+            <button type="button" onclick="window.print()" class="print-btn print-btn--primary">
+                طباعة المذكرة (Print)
+            </button>
+        </div>
+    </div>
+
+    <!-- Official Document Sheet (A4) -->
+    <div class="memo-sheet-wrapper">
+        <main class="memo-sheet">
+
+            <!-- Organization Header -->
+            <header class="memo-header">
+                <div class="memo-header__org">
+                    <div>الهيئة العامة للتأمين الصحي</div>
+                    <div>الإدارة العامة للخدمات الطبية</div>
+                </div>
+                <div class="memo-header__logo">
+                    <img src="{% static 'images/logo.png' %}" alt="شعار الهيئة">
+                </div>
+            </header>
+
+            <div class="memo-dotted-separator"></div>
+
+            <div class="memo-writer-initials">
+                أ/ غادة
+            </div>
+
+            <!-- Addressed Authority -->
+            <div class="memo-recipient">
+                السيد الدكتور / رئيس الإدارة المركزية للشئون الطبية
+            </div>
+
+            <!-- Meta Row -->
+            <div class="memo-meta-row">
+                <div>جهة العرض: - الإدارة العامة للخدمات الطبية.</div>
+                <div>تاريخ العرض: - {{ request_obj.memo_date|date:"Y/m/d"|default:today_date|date:"Y/m/d" }}</div>
+            </div>
+
+            <!-- ==============================================
+                 1. موضوع المذكرة (الموضوع)
+            ============================================== -->
+            <div class="memo-section-title">الموضوع: -</div>
+            <div class="memo-section-body">
+                {% if request_obj.request_type == 'ATG' %}
+                بشأن الطلب المقدم من ولي أمر الطفل / <strong>{{ request_obj.patient.full_name }}</strong> ت.ص. رقم / <strong>{{ request_obj.patient.insurance_number }}</strong> التابع لفرع <strong>{{ request_obj.patient.get_affiliated_branch_display }}</strong> الموافقة على صرف العلاج التحضيري لعملية زرع النخاع ATG (Grafolon) الوزن <strong>{{ request_obj.patient_weight|floatformat:0 }}</strong> كيلو.
+                {% elif request_obj.request_type == 'HAPLOIDENTICAL' %}
+                بشأن الموافقة على إجراء عملية زرع نخاع عظمى من متبرع نصف متوافق بتكلفة إجمالية بمبلغ <strong>280000</strong> (مئتان وثمانون ألف جنيهاً فقط لا غير) بمستشفى <strong>{{ request_obj.hospital.name }}</strong> للطالب / <strong>{{ request_obj.patient.full_name }}</strong> ت.ص رقم-: / <strong>{{ request_obj.patient.insurance_number }}</strong> التابع لفرع <strong>{{ request_obj.patient.get_affiliated_branch_display }}</strong>.
+                {% else %}
+                بشأن الموافقة على استخراج أمر دفع بمبلغ <strong>{{ request_obj.approved_amount|floatformat:0 }}</strong> جنيه ({{ request_obj.amount_in_words }}) قيمة إجراء عملية {{ request_obj.get_request_type_display }} للمنتفعة/للمريض <strong>{{ request_obj.patient.full_name }}</strong> ت.ص رقم/ <strong>{{ request_obj.patient.insurance_number }}</strong> التابع لفرع <strong>{{ request_obj.patient.get_affiliated_branch_display }}</strong>.
+                {% endif %}
+            </div>
+
+            <!-- ==============================================
+                 2. البحث الطبي والإداري (البحث)
+            ============================================== -->
+            <div class="memo-section-title">البحـث: -</div>
+            <div class="memo-section-body">
+
+                {% if request_obj.request_type == 'ATG' %}
+                <!-- سيناريو ATG -->
+                <div class="memo-bullet-point">
+                    - المريض المذكور يعاني من ({{ request_obj.patient.diagnosis }}) ويحتاج إلى إجراء عملية زرع نخاع عظمى من متبرع متوافق كلياً.
+                </div>
+                <div class="memo-bullet-point">
+                    - تقدم ولي الأمر بإفادة من مستشفى {{ request_obj.hospital.name }} بأن الطالب يحتاج إلى <strong>{{ request_obj.atg_dose_ampules }}</strong> أمبول عقار Grafolon (Rabbit ATG) تركيز الأمبول 100 ميلجرام وذلك لعدم توافر العقار بمنظومة الشراء الموحد.
+                </div>
+                <div class="memo-bullet-point">
+                    - مرفق إفادة من مستشفى {{ request_obj.hospital.name }} أن إجمالي الجرعة المطلوبة للمريض هو 21 مليجرام/كجم في حال استخدام عقار جرافالون (Rabbit ATG) (مرفق الإفادة).
+                </div>
+                <div class="memo-bullet-point">
+                    - طبقاً لإفادة التموين الطبي بالهيئة أن عقار جرافالون (Rabbit ATG) متوفر حالياً بمنظومة الشراء ATG تركيز الأمبول 100 ميلجرام 14694ج وبعد إضافة نسبة 7% يصبح تكلفة الأمبول 15.722.5ج طبقاً لإفادة التموين الطبي.
+                </div>
+                <div class="memo-bullet-point">
+                    - وعليه فإن الجرعة الإجمالية المطلوبة من عقار (ATG) للمريض كعلاج تحضيري لعملية زرع النخاع العظمى من متبرع متوافق هي 21 × {{ request_obj.patient_weight|floatformat:0 }} = {{ request_obj.atg_total_mg|floatformat:0 }} ميلجرام ما يعادل <strong>{{ request_obj.atg_dose_ampules }}</strong> أمبول.
+                </div>
+
+                {% elif request_obj.request_type == 'HAPLOIDENTICAL' %}
+                <!-- سيناريو نصف المتوافق -->
+                <div class="memo-bullet-point">
+                    - تم عرض المريض على ({{ request_obj.referring_clinic_or_committee|default:"لجنة أمراض الدم" }}) حيث إنه يعاني {{ request_obj.patient.diagnosis }} وأوصت اللجنة بتحويله إلى إحدى المراكز المتعاقدة لعمل زرع نخاع عظمى من متبرع نصف متوافق بعد ما أجريت له تحاليل توافق الأنسجة بمعمل {{ request_obj.hla_lab_name|default:"المعمل المركزي" }}.
+                </div>
+                <div class="memo-bullet-point">
+                    - حصل المريض على إفادة من مستشفى {{ request_obj.hospital.name }} بالموافقة على إجراء عملية زرع نخاع عظمى من متبرع نصف متوافق بتكلفة {{ request_obj.hospital_initial_cost|default:700000|floatformat:0 }}ج (سبعمائة ألف جنيهاً فقط لا غير).
+                </div>
+                <div class="memo-bullet-point">
+                    - بناءً على موافقة السيد الدكتور/ رئيس مجلس الإدارة على إجراء عمليات زرع النخاع من متبرع نصف متوافق بمبلغ 280000ج (كصفقة شاملة الإقامة والأدوية والعلاج التحضيري) بتاريخ 2024/9/18.
+                </div>
+                <div class="memo-bullet-point">
+                    - تم توقيع ولي الأمر ({% if request_obj.guardian_name %}{{ request_obj.guardian_relation|default:"الأب" }}{% else %}الأب{% endif %}) إقرار بأنه لن يطالب الهيئة بأي مصاريف تزيد عن 280000 ج بعد موافقة الهيئة.
+                </div>
+
+                {% else %}
+                <!-- سيناريو الذاتي والمتوافق كلياً -->
+                <div class="memo-bullet-point">
+                    - تم عرض المريض على {{ request_obj.referring_clinic_or_committee|default:"لجنة أمراض الدم" }} حيث إنه يعاني من {{ request_obj.patient.diagnosis }} وأوصت اللجنة بتحويله إلى إحدى المراكز المتعاقدة لعمل عملية {{ request_obj.get_request_type_display }}{% if request_obj.hla_lab_name %} بعد ما أجريت له تحاليل توافق الأنسجة بمعمل {{ request_obj.hla_lab_name }}{% endif %}.
+                </div>
+                <div class="memo-bullet-point">
+                    - بناءً على موافقة السيد الدكتور/ رئيس مجلس إدارة الهيئة العامة للتأمين الصحي على إجراء عمليات {{ request_obj.get_request_type_display }} بمستشفى {{ request_obj.hospital.name }} بمبلغ {{ request_obj.approved_amount|floatformat:0 }}ج{% if request_obj.payment_type == 'TWO_INSTALLMENTS' %} بالنسبة للدفع يتم على دفعتين كالتالي:
+                    <div style="padding-right: 1.5rem; margin-top: 0.35rem;">
+                        <div>- الدفعة الأولى: بالدفع الإلكتروني بمبلغ <strong>{{ request_obj.installment_1|floatformat:0 }}</strong> جنية (أربعون ألف جنيهاً)</div>
+                        <div>- الدفعة الثانية: بالدفع الإلكتروني بباقي المبلغ بقيمة <strong>{{ request_obj.installment_2|floatformat:0 }}</strong> (مائة وعشرة آلاف جنيهاً) عند الدخول لإجراء الزرع.</div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+            </div>
+
+            <!-- ==============================================
+                 3. الرأي المعروض (الرأي)
+            ============================================== -->
+            <div class="memo-section-title">الـــرأي: -</div>
+            <div class="memo-section-body">
+
+                {% if request_obj.request_type == 'ATG' %}
+                ربما ترون سيادتكم الموافقة على صرف عدد <strong>{{ request_obj.atg_dose_ampules }}</strong> أمبول عقار ATG (Rabbit) تركيز الأمبول 100 مليجرام كعلاج تحضيري لإجراء عملية زرع نخاع عظمى من متبرع متوافق بمستشفى <strong>{{ request_obj.hospital.name }}</strong> بإجمالي تكلفة <strong>{{ request_obj.approved_amount|floatformat:2 }}</strong> ج ({{ request_obj.amount_in_words }}) وذلك خصماً على فرع ({{ request_obj.patient.get_affiliated_branch_display }}).
+
+                {% elif request_obj.request_type == 'HAPLOIDENTICAL' %}
+                معروض على سيادتكم للتكرم بالموافقة على إجراء عملية زرع نخاع عظمى من متبرع نصف متوافق (كصفقة شاملة الإقامة والأدوية والعلاج التحضيري بعقار ATG) وذلك بتكلفة إجمالية وقدرها <strong>280000</strong>ج (مئتان وثمانون ألف جنيهاً فقط لا غير) بمستشفى <strong>{{ request_obj.hospital.name }}</strong> وعلى أن يتم استخراج إذن الدفع بالمبلغ لصالح المستشفى من رئاسة الهيئة كدفع مقدم.
+                <div style="margin-top: 0.4rem; text-align: center; font-weight: 700;">والأمر مفوض لسيادتكم</div>
+
+                {% else %}
+                ربما ترون سيادتكم التكرم بالموافقة على استخراج أمر دفع {% if request_obj.payment_type == 'TWO_INSTALLMENTS' %}بإجمالي <strong>{{ request_obj.approved_amount|floatformat:0 }}</strong>ج ({{ request_obj.amount_in_words }}) على أن تكون على دفعتين{% else %}بمبلغ <strong>{{ request_obj.approved_amount|floatformat:0 }}</strong>ج ({{ request_obj.amount_in_words }}){% endif %} باسم مستشفى <strong>{{ request_obj.hospital.name }}</strong> قيمة إجراء عملية {{ request_obj.get_request_type_display }} للمنتفع المذكور وخصماً على حساب فرع <strong>{{ request_obj.patient.get_affiliated_branch_display }}</strong> ويمكن تعديل قرار اللجنة بنفس القيمة إلى أي جهة متعاقدة يرغب بها المنتفع.
+                {% endif %}
+
+            </div>
+
+            <div class="memo-closing">
+                وتفضلوا بقبول فائق الاحترام ...
+            </div>
+
+            <!-- ==============================================
+                 4. التوقيعات والاعتماد
+            ============================================== -->
+            <div class="memo-signatures">
+                <div class="memo-signatures__right">
+                    <div>إدارة الخدمات الطبية</div>
+                    <div style="margin-top: 0.35rem; font-size: 12.5pt;">د/ حنان نصر الله</div>
+                </div>
+                <div class="memo-signatures__left">
+                    <div>مدير الإدارة العامة للخدمات الطبية</div>
+                    <div style="margin-top: 0.35rem; font-size: 12.5pt;">د/ ريهام مدحت</div>
+                </div>
+            </div>
+
+            <div class="memo-approval-box">
+                <div style="margin-bottom: 0.25rem;">يعتمد،،،</div>
+                <div style="font-size: 13pt;">رئيس الإدارة المركزية للشئون الطبية</div>
+                <div style="margin-top: 0.35rem; font-size: 13pt;">د. السيد جلال الشربيني</div>
+            </div>
+
+            <!-- Footer Code -->
+            <div class="memo-footer-code">
+                أ/ غادة - {{ request_obj.request_code }}
+            </div>
+
+        </main>
+    </div>
+
+</body>
+</html>

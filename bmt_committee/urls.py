@@ -12,6 +12,6 @@ urlpatterns = [
     path("requests/<int:pk>/send/", views.send_for_approval, name="send_for_approval"),
     path("requests/<int:pk>/return/", views.record_return, name="record_return"),
     path("requests/<int:pk>/change-hospital/", views.change_hospital, name="change_hospital"),
-    path("requests/<int:pk>/contact-patient/", views.record_patient_contact, name="record_patient_contact"),
-    path("requests/<int:pk>/deliver-letter/", views.record_letter_delivery, name="record_letter_delivery"),
+    path("requests/<int:pk>/handover-social-services/", views.handover_to_social_services, name="handover_social_services"),
+    path("requests/<int:pk>/print/memo/", views.memo_print, name="memo_print"),
 ]

@@ -322,50 +322,20 @@ class ChangeHospitalForm(forms.Form):
         return new_hospital
 
 
-class PatientContactForm(forms.Form):
-    contacted_at = forms.DateTimeField(
-        label="تاريخ ووقت التواصل مع المريض",
-        widget=forms.DateTimeInput(attrs={"type": "datetime-local", "class": "form-input"}),
-        required=True,
-    )
-    hospital_letter_number = forms.CharField(
-        label="رقم الخطاب الموجه للمستشفى",
-        max_length=100,
-        required=True,
-        widget=forms.TextInput(attrs={"class": "form-input", "placeholder": "أدخل رقم الخطاب الرسمي"}),
-    )
-    hospital_letter_date = forms.DateField(
-        label="تاريخ الخطاب",
+class SocialServicesHandoverForm(forms.Form):
+    handover_date = forms.DateField(
+        label="تاريخ تسليم المذكرة للخدمة الاجتماعية",
         widget=forms.DateInput(attrs={"type": "date", "class": "form-input"}),
         required=True,
     )
-    notes = forms.CharField(
-        label="ملاحظات التواصل",
-        required=False,
-        widget=forms.Textarea(attrs={"class": "form-textarea", "rows": 3, "placeholder": "تفاصيل الاتصال بالمريض أو ولي أمره وتأكيد موعد استلام الخطاب"}),
-    )
-
-
-class LetterDeliveryForm(forms.Form):
-    delivered_at = forms.DateTimeField(
-        label="تاريخ ووقت تسليم الخطاب",
-        widget=forms.DateTimeInput(attrs={"type": "datetime-local", "class": "form-input"}),
-        required=True,
-    )
-    recipient_name = forms.CharField(
-        label="اسم المستلم",
+    social_worker_name = forms.CharField(
+        label="اسم مستلم الخدمة الاجتماعية / الأخصائي",
         max_length=200,
         required=True,
-        widget=forms.TextInput(attrs={"class": "form-input", "placeholder": "اسم المريض أو ولي الأمر المستلم"}),
-    )
-    recipient_relation = forms.CharField(
-        label="صلة القرابة (إن وجد)",
-        max_length=100,
-        required=False,
-        widget=forms.TextInput(attrs={"class": "form-input", "placeholder": "نفسه / الأب / الأخ / الزوج ..."}),
+        widget=forms.TextInput(attrs={"class": "form-input", "placeholder": "اسم الأخصائي الاجتماعي المستلم للإجراء"}),
     )
     notes = forms.CharField(
         label="ملاحظات التسليم",
         required=False,
-        widget=forms.Textarea(attrs={"class": "form-textarea", "rows": 3, "placeholder": "أي ملاحظات إضافية أثناء التسليم"}),
+        widget=forms.Textarea(attrs={"class": "form-textarea", "rows": 3, "placeholder": "أي ملاحظات إضافية حول تسليم المذكرة للخدمة الاجتماعية"}),
     )

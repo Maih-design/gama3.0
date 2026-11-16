@@ -16,9 +16,7 @@ class RequestStatus(models.TextChoices):
     RETURNED = "RETURNED", _("واردة من الاعتماد")
     APPROVED = "APPROVED", _("معتمدة")
     REJECTED = "REJECTED", _("مرفوضة")
-    PENDING_PATIENT_CONTACT = "PENDING_PATIENT_CONTACT", _("معتمدة - بانتظار التواصل مع المريض")
-    PATIENT_CONTACTED = "PATIENT_CONTACTED", _("تم التواصل وتجهيز الخطاب")
-    LETTER_DELIVERED = "LETTER_DELIVERED", _("تم تسليم الخطاب للمريض")
+    PENDING_SOCIAL_SERVICES = "PENDING_SOCIAL_SERVICES", _("معتمدة - بانتظار التسليم للخدمة الاجتماعية")
     COMPLETED = "COMPLETED", _("مكتملة وموجهة")
 
 
@@ -34,9 +32,7 @@ class MovementAction(models.TextChoices):
     APPROVED = "APPROVED", _("تسجيل قرار الاعتماد")
     REJECTED = "REJECTED", _("تسجيل قرار الرفض")
     HOSPITAL_CHANGED = "HOSPITAL_CHANGED", _("تعديل المستشفى المعالج")
-    PATIENT_CONTACTED = "PATIENT_CONTACTED", _("التواصل مع المريض")
-    LETTER_PREPARED = "LETTER_PREPARED", _("تجهيز الخطاب الموجه للمستشفى")
-    LETTER_DELIVERED = "LETTER_DELIVERED", _("تسليم الخطاب للمريض")
+    HANDOVER_SOCIAL_SERVICES = "HANDOVER_SOCIAL_SERVICES", _("تسليم المذكرة للخدمة الاجتماعية")
     ROUTED = "ROUTED", _("توجيه المذكرة والأرشفة")
     UPDATED = "UPDATED", _("تحديث بيانات الطلب")
 

@@ -196,15 +196,28 @@ def determine_bmt_financials(request_type, hospital=None):
 
         if service_price:
             amount = service_price.price
+        else:
+            amount = BMT_STANDARD_150K
+
+        # تطبيق قاعدة الدفعات استناداً للمبلغ (للزرع الذاتي والمتوافق كلياً):
+        # - إذا كان 150 ألف: يُقسم إلى دفعتين (40 ألف و 110 ألف)
+        # - إذا كان 175 ألف: يكون دفعة واحدة
+        if amount == BMT_STANDARD_150K:
+            payment_type = PaymentType.TWO_INSTALLMENTS
+            installment_1 = BMT_150K_INSTALLMENT_1
+            installment_2 = BMT_150K_INSTALLMENT_2
+        elif amount == BMT_STANDARD_175K:
+            payment_type = PaymentType.SINGLE
+            installment_1 = BMT_STANDARD_175K
+            installment_2 = Decimal("0.00")
+        elif service_price and service_price.payment_type:
             payment_type = service_price.payment_type
             installment_1 = service_price.installment_1
             installment_2 = service_price.installment_2
         else:
-            # القيمة الافتراضية للذاتي والمتطابق كلياً هي 150,000 ج.م على دفعتين
-            amount = BMT_STANDARD_150K
-            payment_type = PaymentType.TWO_INSTALLMENTS
-            installment_1 = BMT_150K_INSTALLMENT_1
-            installment_2 = BMT_150K_INSTALLMENT_2
+            payment_type = PaymentType.SINGLE
+            installment_1 = amount
+            installment_2 = Decimal("0.00")
 
     amount_in_words = tafqeet_egyptian_pounds(amount)
 
@@ -222,10 +235,12 @@ def determine_memo_routing(request_type, patient_branch_display):
     تحديد جهة توجيه المذكرة الرسمية:
     - نصف متطابق: رئاسة الهيئة (الإدارة المركزية للشئون المالية)
     - ذاتي / متطابق: فرع التأمين التابع له المريض (خصماً على حساب الفرع)
-    - ATG: فرع التأمين التابع له المريض (خصماً على حساب الفرع)
+    - ATG: الخدمة الاجتماعية بالإدارة العامة للخدمات الطبية
     """
     if request_type == RequestType.HAPLOIDENTICAL:
         return "رئاسة الهيئة - الإدارة المركزية للشئون المالية"
+    elif request_type == RequestType.ATG:
+        return "الخدمة الاجتماعية بالإدارة"
     else:
         branch = patient_branch_display or "فرع المريض"
         return f"{branch}"

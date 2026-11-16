@@ -10,10 +10,9 @@ from .forms import (
     BmtRequestCreateForm,
     BmtRequestUpdateForm,
     ChangeHospitalForm,
-    LetterDeliveryForm,
-    PatientContactForm,
     RecordReturnForm,
     SendForApprovalForm,
+    SocialServicesHandoverForm,
 )
 from .models import BmtRequest, MemoMovement
 from .operations import can_change_hospital, record_memo_movement
@@ -34,24 +33,16 @@ def dashboard(request):
         "approved": requests_qs.filter(
             status__in=[
                 RequestStatus.APPROVED,
-                RequestStatus.PENDING_PATIENT_CONTACT,
-                RequestStatus.PATIENT_CONTACTED,
-                RequestStatus.LETTER_DELIVERED,
+                RequestStatus.PENDING_SOCIAL_SERVICES,
                 RequestStatus.COMPLETED,
             ]
         ).count(),
         "rejected": requests_qs.filter(status=RequestStatus.REJECTED).count(),
-        "atg_pending_contact": requests_qs.filter(
+        "atg_pending_handover": requests_qs.filter(
             request_type=RequestType.ATG,
-            status=RequestStatus.PENDING_PATIENT_CONTACT
+            status=RequestStatus.PENDING_SOCIAL_SERVICES
         ).count(),
-        "atg_pending_delivery": requests_qs.filter(
-            request_type=RequestType.ATG,
-            status=RequestStatus.PATIENT_CONTACTED
-        ).count(),
-        "completed": requests_qs.filter(
-            status__in=[RequestStatus.COMPLETED, RequestStatus.LETTER_DELIVERED]
-        ).count(),
+        "completed": requests_qs.filter(status=RequestStatus.COMPLETED).count(),
     }
 
     recent_requests = (
@@ -283,11 +274,11 @@ def record_return(request, pk):
             bmt_request.manual_incoming_date = incoming_date
 
             if decision == "APPROVED":
-                # مسار ATG ينتقل لحالة بانتظار التواصل مع المريض
+                # مسار ATG ينتقل لحالة بانتظار التسليم للخدمة الاجتماعية
                 if bmt_request.request_type == RequestType.ATG:
-                    to_status = RequestStatus.PENDING_PATIENT_CONTACT
+                    to_status = RequestStatus.PENDING_SOCIAL_SERVICES
                     action = MovementAction.APPROVED
-                    action_msg = "تم اعتماد المذكرة. الحالة الآن بانتظار التواصل مع المريض."
+                    action_msg = "تم اعتماد المذكرة. الحالة الآن بانتظار تسليمها للخدمة الاجتماعية بالإدارة."
                 else:
                     # مسار زرع النخاع
                     to_status = RequestStatus.APPROVED
@@ -379,9 +370,10 @@ def change_hospital(request, pk):
 
 
 @login_required
-def record_patient_contact(request, pk):
+def handover_to_social_services(request, pk):
     """
-    تسجيل التواصل مع مريض ATG وتجهيز الخطاب الموجه للمستشفى
+    تسجيل تسليم مذكرة ATG المعتمدة للخدمة الاجتماعية بالإدارة
+    (المسؤولة عن استكمال الإجراءات والتواصل مع المريض وإصدار الخطاب خارج اللجنة)
     """
     bmt_request = get_object_or_404(
         BmtRequest,
@@ -390,39 +382,35 @@ def record_patient_contact(request, pk):
     )
 
     if request.method == "POST":
-        form = PatientContactForm(request.POST)
+        form = SocialServicesHandoverForm(request.POST)
         if form.is_valid():
-            bmt_request.patient_contacted_at = form.cleaned_data["contacted_at"]
-            bmt_request.hospital_letter_number = form.cleaned_data["hospital_letter_number"]
-            bmt_request.hospital_letter_date = form.cleaned_data["hospital_letter_date"]
-            bmt_request.save(update_fields=[
-                "patient_contacted_at",
-                "hospital_letter_number",
-                "hospital_letter_date",
-                "updated_at",
-            ])
+            handover_date = form.cleaned_data["handover_date"]
+            social_worker = form.cleaned_data["social_worker_name"]
+            notes = form.cleaned_data["notes"]
+
+            notes_full = f"تم تسليم أصل المذكرة للخدمة الاجتماعية بالإدارة (المستلم: {social_worker} بتاريخ {handover_date}). {notes}".strip()
 
             record_memo_movement(
                 bmt_request=bmt_request,
-                action=MovementAction.PATIENT_CONTACTED,
-                to_status=RequestStatus.PATIENT_CONTACTED,
-                notes=f"تم التواصل وتجهيز خطاب المستشفى برقم {bmt_request.hospital_letter_number}. ملاحظات: {form.cleaned_data['notes']}",
+                action=MovementAction.HANDOVER_SOCIAL_SERVICES,
+                to_status=RequestStatus.COMPLETED,
+                destination="الخدمة الاجتماعية بالإدارة العامة للخدمات الطبية",
+                notes=notes_full,
                 user=request.user,
             )
 
-            messages.success(request, "تم تسجيل التواصل مع المريض وتجهيز بيانات الخطاب بنجاح.")
+            messages.success(request, "تم تسجيل تسليم المذكرة للخدمة الاجتماعية بالإدارة بنجاح واكتمال دورة اللجنة.")
             return redirect("bmt_committee:request_detail", pk=bmt_request.pk)
     else:
+        from django.utils import timezone
         initial = {
-            "patient_contacted_at": bmt_request.patient_contacted_at,
-            "hospital_letter_number": bmt_request.hospital_letter_number,
-            "hospital_letter_date": bmt_request.hospital_letter_date,
+            "handover_date": timezone.now().date(),
         }
-        form = PatientContactForm(initial=initial)
+        form = SocialServicesHandoverForm(initial=initial)
 
     return render(
         request,
-        "bmt_committee/actions/record_patient_contact.html",
+        "bmt_committee/actions/handover_social_services.html",
         {
             "form": form,
             "bmt_request": bmt_request,
@@ -431,54 +419,23 @@ def record_patient_contact(request, pk):
 
 
 @login_required
-def record_letter_delivery(request, pk):
+def memo_print(request, pk):
     """
-    تسجيل تسليم الخطاب الرسمي للمريض / ولي أمره (عقار ATG)
+    عرض وطباعة مذكرة الموافقة المالية الرسمية
+    (زرع نخاع ذاتي / متطابق / نصف متوافق / عقار ATG)
     """
+    from django.utils import timezone
     bmt_request = get_object_or_404(
-        BmtRequest,
-        pk=pk,
-        request_type=RequestType.ATG
+        BmtRequest.objects.select_related("patient", "hospital"),
+        pk=pk
     )
-
-    if request.method == "POST":
-        form = LetterDeliveryForm(request.POST)
-        if form.is_valid():
-            delivered_at = form.cleaned_data["delivered_at"]
-            recipient = form.cleaned_data["recipient_name"]
-            rel = form.cleaned_data["recipient_relation"]
-            notes = form.cleaned_data["notes"]
-
-            bmt_request.letter_delivered_at = delivered_at
-            bmt_request.save(update_fields=["letter_delivered_at", "updated_at"])
-
-            rel_text = f" ({rel})" if rel else ""
-            notes_full = f"تم تسليم الخطاب إلى: {recipient}{rel_text}. {notes}".strip()
-
-            record_memo_movement(
-                bmt_request=bmt_request,
-                action=MovementAction.LETTER_DELIVERED,
-                to_status=RequestStatus.LETTER_DELIVERED,
-                destination="المريض / ولي الأمر",
-                notes=notes_full,
-                user=request.user,
-            )
-
-            messages.success(request, "تم تسجيل تسليم الخطاب للمريض بنجاح واكتمال الدورة.")
-            return redirect("bmt_committee:request_detail", pk=bmt_request.pk)
-    else:
-        initial = {
-            "delivered_at": bmt_request.letter_delivered_at,
-            "recipient_name": bmt_request.guardian_name or bmt_request.patient.full_name,
-            "recipient_relation": bmt_request.guardian_relation or "نفسه",
-        }
-        form = LetterDeliveryForm(initial=initial)
 
     return render(
         request,
-        "bmt_committee/actions/record_letter_delivery.html",
+        "bmt_committee/print/memo_print.html",
         {
-            "form": form,
-            "bmt_request": bmt_request,
+            "request_obj": bmt_request,
+            "today_date": timezone.now().date(),
         }
     )
+

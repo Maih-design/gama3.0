@@ -1,0 +1,134 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خطاب مستشفى (عقار ATG) - {{ request_obj.patient.full_name }}</title>
+    <link rel="stylesheet" href="{% static 'css/bmt_print.css' %}">
+</head>
+<body>
+
+    <!-- Print Action Toolbar -->
+    <div class="print-toolbar no-print">
+        <div class="print-toolbar__info">
+            <span class="print-toolbar__title">خطاب موجه إلى المستشفى (عقار ATG)</span>
+            <span class="print-toolbar__subtitle">
+                رقم الخطاب: {{ request_obj.hospital_letter_number|default:"قيد الإصدار" }} | المستشفى: {{ request_obj.hospital.name }} | المريض: {{ request_obj.patient.full_name }}
+            </span>
+        </div>
+        <div class="print-toolbar__actions">
+            <a href="{% url 'bmt_committee:request_detail' request_obj.pk %}" class="print-btn print-btn--secondary">
+                &rarr; العودة لملف الطلب
+            </a>
+            <button type="button" onclick="window.print()" class="print-btn print-btn--primary">
+                طباعة الخطاب (Print)
+            </button>
+        </div>
+    </div>
+
+    <!-- Official Document Sheet (A4) -->
+    <div class="memo-sheet-wrapper">
+        <main class="memo-sheet">
+
+            <!-- Organization Header -->
+            <header class="memo-header">
+                <div class="memo-header__org">
+                    <div>الهيئة العامة للتأمين الصحي</div>
+                    <div>الإدارة العامة للخدمات الطبية</div>
+                    <div style="font-size: 11pt; color: #334155;">لجنة زرع النخاع وعقار ATG</div>
+                </div>
+                <div class="memo-header__logo">
+                    <img src="{% static 'images/logo.png' %}" alt="شعار الهيئة">
+                </div>
+            </header>
+
+            <div class="memo-dotted-separator"></div>
+
+            <!-- Letter Meta Details -->
+            <div style="display: flex; justify-content: space-between; font-size: 12pt; font-weight: 700; margin-bottom: 1.5rem;">
+                <div>رقم الخطاب: <strong>{{ request_obj.hospital_letter_number|default:"........................" }}</strong></div>
+                <div>التاريخ: <strong>{{ request_obj.hospital_letter_date|date:"Y/m/d"|default:today_date|date:"Y/m/d" }}</strong></div>
+            </div>
+
+            <!-- Addressed Hospital -->
+            <div style="margin: 1.5rem 0 1rem; font-size: 14pt; font-weight: 700; line-height: 1.6;">
+                <div>السيد الأستاذ الدكتور / مدير {{ request_obj.hospital.name }}</div>
+                <div style="font-size: 12.5pt; font-weight: 600; margin-top: 0.25rem;">تحية طيبة وبعد،،،</div>
+            </div>
+
+            <!-- Subject -->
+            <div style="background: #f1f5f9; padding: 0.75rem 1rem; border-radius: 6px; font-weight: 700; font-size: 13pt; margin-bottom: 1.5rem;">
+                الموضوع: بشأن صرف العلاج التحضيري بعقار ATG للمريض / {{ request_obj.patient.full_name }}
+            </div>
+
+            <!-- Body Text -->
+            <div style="font-size: 13pt; line-height: 1.8; text-align: justify; margin-bottom: 2rem;">
+                <p>
+                    بالإشارة إلى موافقة السيد الدكتور / رئيس الإدارة المركزية للشئون الطبية على المذكرة رقم
+                    <strong>{{ request_obj.manual_outgoing_number|default:request_obj.request_code }}</strong>
+                    بتاريخ <strong>{{ request_obj.memo_date|date:"Y/m/d" }}</strong> بشأن الموافقة على صرف العلاج التحضيري لعملية زرع النخاع العظمي.
+                </p>
+
+                <p>
+                    نحيط سيادتكم علماً بأنه قد تمت الموافقة على صرف عقار:
+                    <br>
+                    <strong style="font-size: 14pt; color: #000000;">
+                        Grafolon (Rabbit ATG) تركيز 100 مجم
+                    </strong>
+                    <br>
+                    بعدد <strong>({{ request_obj.atg_dose_ampules }}) أمبول</strong> فقط لا غير،
+                    محسوبة وفقاً للوزن المعتمد (<strong>{{ request_obj.patient_weight|floatformat:0 }} كجم</strong>) بإجمالي جرعة (<strong>{{ request_obj.atg_total_mg|floatformat:0 }} مجم</strong>).
+                </p>
+
+                <p>
+                    وذلك لإجراء عملية زرع نخاع عظمي من متبرع متوافق للمريض المذكور:
+                    <br>
+                    - الرقم القومي: <strong>{{ request_obj.patient.national_id }}</strong>
+                    <br>
+                    - الرقم التأميني: <strong>{{ request_obj.patient.insurance_number }}</strong>
+                    <br>
+                    - فرع التأمين الصحي: <strong>{{ request_obj.patient.get_affiliated_branch_display }}</strong>
+                    <br>
+                    - التشخيص: <strong>{{ request_obj.patient.diagnosis }}</strong>
+                </p>
+
+                <p>
+                    على أن يتم الصرف خصماً على حساب <strong>فرع {{ request_obj.patient.get_affiliated_branch_display }}</strong>.
+                    يرجى التكرم باتخاذ الإجراءات الطبية اللازمة نحو تسليم واستخدام العقار وفق البروتوكول العلاجي المعتمد.
+                </p>
+            </div>
+
+            <div class="memo-closing">
+                وتفضلوا بقبول فائق الاحترام والتقدير،،،
+            </div>
+
+            <!-- Signatures -->
+            <div class="memo-signatures" style="margin-top: 2rem;">
+                <div class="memo-signatures__right">
+                    <div>إدارة الخدمات الطبية</div>
+                    <div style="margin-top: 0.5rem; font-size: 13pt;">د/ حنان نصر الله</div>
+                </div>
+                <div class="memo-signatures__left">
+                    <div>مدير الإدارة العامة للخدمات الطبية</div>
+                    <div style="margin-top: 0.5rem; font-size: 13pt;">د/ ريهام مدحت</div>
+                </div>
+            </div>
+
+            <div class="memo-approval-box" style="margin-top: 2rem;">
+                <div>يعتمد،،،</div>
+                <div style="font-size: 13.5pt;">رئيس الإدارة المركزية للشئون الطبية</div>
+                <div style="margin-top: 0.5rem; font-size: 13.5pt;">د. السيد جلال الشربيني</div>
+            </div>
+
+            <!-- Footer Notes -->
+            <div style="margin-top: 2.5rem; font-size: 10.5pt; color: #475569; border-top: 1px solid #e2e8f0; padding-top: 0.5rem;">
+                <div>صورة إلى: - ملف المريض باللجنة.</div>
+                <div>- فرع {{ request_obj.patient.get_affiliated_branch_display }}.</div>
+            </div>
+
+        </main>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    {{ title }} - لجنة زرع النخاع و ATG
+{% endblock %}
+
+{% block content %}
+<div class="page page-content">
+
+    <header class="page-header">
+        <div class="page-header__content">
+            <h1 class="page-title">{{ title }}</h1>
+            <p class="page-subtitle">
+                إدخال بيانات الحالة والمذكرة المالية للجنة زرع النخاع وعقار ATG
+            </p>
+        </div>
+
+        <div class="page-header__actions">
+            <a href="{% url 'bmt_committee:request_list' %}" class="btn btn-secondary">
+                عودة للقائمة
+            </a>
+        </div>
+    </header>
+
+    {% if form.errors %}
+    <div class="alert alert--danger" style="margin-bottom: 1.5rem;">
+        <strong>يرجى تصحيح الأخطاء التالية:</strong>
+        <ul style="margin: 0.5rem 0 0; padding-right: 1.5rem;">
+            {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                <li>{{ field }}: {{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="card" style="max-width: 900px; margin: 0 auto;">
+        <form method="post" novalidate style="padding: 1.5rem 2rem;">
+            {% csrf_token %}
+
+            <!-- القسم 1: بيانات الحالة والجهة -->
+            <div style="border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                <h3 style="color: #0f766e; margin: 0 0 0.5rem; font-size: 1.15rem;">
+                    1. بيانات المريض ونوع الإجراء
+                </h3>
+                <p style="color: #64748b; font-size: 0.85rem; margin: 0;">
+                    حدد المريض المسجل بالنظام ونوع الإجراء والمستشفى المعالج المتعاقد
+                </p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
+                <div>
+                    <label class="form-label" style="font-weight: 700; margin-bottom: 0.35rem; display: block;">
+                        {{ form.patient.label }} <span style="color: red;">*</span>
+                    </label>
+                    {{ form.patient }}
+                </div>
+
+                <div>
+                    <label class="form-label" style="font-weight: 700; margin-bottom: 0.35rem; display: block;">
+                        {{ form.request_type.label }} <span style="color: red;">*</span>
+                    </label>
+                    {{ form.request_type }}
+                </div>
+
+                <div style="grid-column: span 2;">
+                    <label class="form-label" style="font-weight: 700; margin-bottom: 0.35rem; display: block;">
+                        {{ form.hospital.label }} <span style="color: red;">*</span>
+                    </label>
+                    {{ form.hospital }}
+                    <small style="color: #64748b; display: block; margin-top: 0.25rem;">
+                        تظهر هنا فقط المستشفيات والمراكز المعتمدة والمفعلة للجنة زرع النخاع
+                    </small>
+                </div>
+            </div>
+
+            <!-- القسم 2: حقل وزن المريض الخاص بـ ATG -->
+            <div id="atg_fields_container" style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem; display: none;">
+                <h4 style="color: #166534; margin: 0 0 0.5rem; font-size: 1rem;">
+                    بيانات حساب جرعة عقار ATG التحضيري
+                </h4>
+                <p style="color: #15803d; font-size: 0.85rem; margin-bottom: 1rem;">
+                    يحسب النظام الجرعة تلقائياً بمعدل 21 مجم/كجم وتقريب عدد الأمبولات لأعلى بسعر الأمبول الرسمي (15,722.50 ج.م).
+                </p>
+
+                <div style="max-width: 320px;">
+                    <label class="form-label" style="font-weight: 700; margin-bottom: 0.35rem; display: block;">
+                        {{ form.patient_weight.label }} <span style="color: red;">*</span>
+                    </label>
+                    {{ form.patient_weight }}
+                </div>
+            </div>
+
+            <!-- القسم 3: السياق الطبي والموافقات السابقة بملف المريض -->
+            <div style="border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem; margin-bottom: 1.5rem; margin-top: 2rem;">
+                <h3 style="color: #0f766e; margin: 0 0 0.5rem; font-size: 1.15rem;">
+                    2. الموافقات الطبية والتقارير الواردة بملف المريض
+                </h3>
+                <p style="color: #64748b; font-size: 0.85rem; margin: 0;">
+                    البيانات والموافقات السابقة الواردة من اللجان المتخصصة والمستشفيات للتوثيق بالمذكرة
+                </p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
+                <div>
+                    <label class="form-label" style="font-weight: 600; margin-bottom: 0.35rem; display: block;">
+                        {{ form.referring_clinic_or_committee.label }}
+                    </label>
+                    {{ form.referring_clinic_or_committee }}
+                </div>
+
+                <div>
+                    <label class="form-label" style="font-weight: 600; margin-bottom: 0.35rem; display: block;">
+                        {{ form.hla_lab_name.label }}
+                    </label>
+                    {{ form.hla_lab_name }}
+                </div>
+
+                <div>
+                    <label class="form-label" style="font-weight: 600; margin-bottom: 0.35rem; display: block;">
+                        {{ form.external_approval_number.label }}
+                    </label>
+                    {{ form.external_approval_number }}
+                </div>
+
+                <div>
+                    <label class="form-label" style="font-weight: 600; margin-bottom: 0.35rem; display: block;">
+                        {{ form.external_approval_date.label }}
+                    </label>
+                    {{ form.external_approval_date }}
+                </div>
+
+                <div>
+                    <label class="form-label" style="font-weight: 600; margin-bottom: 0.35rem; display: block;">
+                        {{ form.hospital_initial_cost.label }}
+                    </label>
+                    {{ form.hospital_initial_cost }}
+                    <small style="color: #64748b;">(خاص بحالات نصف المتوافق مثل إفادة المستشفى بـ 700 ألف ج)</small>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                    <div>
+                        <label class="form-label" style="font-weight: 600; margin-bottom: 0.35rem; display: block;">
+                            {{ form.guardian_name.label }}
+                        </label>
+                        {{ form.guardian_name }}
+                    </div>
+                    <div>
+                        <label class="form-label" style="font-weight: 600; margin-bottom: 0.35rem; display: block;">
+                            {{ form.guardian_relation.label }}
+                        </label>
+                        {{ form.guardian_relation }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- القسم 4: المذكرة والدفاتر -->
+            <div style="border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem; margin-bottom: 1.5rem; margin-top: 2rem;">
+                <h3 style="color: #0f766e; margin: 0 0 0.5rem; font-size: 1.15rem;">
+                    3. بيانات العرض والتوثيق الدفتري
+                </h3>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem; margin-bottom: 2rem;">
+                <div>
+                    <label class="form-label" style="font-weight: 600; margin-bottom: 0.35rem; display: block;">
+                        {{ form.memo_date.label }}
+                    </label>
+                    {{ form.memo_date }}
+                </div>
+
+                <div>
+                    <label class="form-label" style="font-weight: 600; margin-bottom: 0.35rem; display: block;">
+                        {{ form.manual_outgoing_number.label }}
+                    </label>
+                    {{ form.manual_outgoing_number }}
+                </div>
+
+                <div>
+                    <label class="form-label" style="font-weight: 600; margin-bottom: 0.35rem; display: block;">
+                        {{ form.manual_outgoing_date.label }}
+                    </label>
+                    {{ form.manual_outgoing_date }}
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div style="display: flex; justify-content: flex-end; gap: 1rem; border-top: 1px solid #e2e8f0; padding-top: 1.5rem;">
+                <a href="{% url 'bmt_committee:request_list' %}" class="btn btn-secondary" style="padding: 0.6rem 1.5rem;">
+                    إلغاء
+                </a>
+                <button type="submit" class="btn btn-primary" style="padding: 0.6rem 2rem;">
+                    حفظ الطلب واحتساب المذكرة
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+<!-- Vanilla JS لإظهار حقول ATG تلقائياً عند اختيار نوع الطلب -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const typeSelect = document.getElementById("id_request_type");
+        const atgContainer = document.getElementById("atg_fields_container");
+
+        function toggleAtgFields() {
+            if (typeSelect && atgContainer) {
+                if (typeSelect.value === "ATG") {
+                    atgContainer.style.display = "block";
+                } else {
+                    atgContainer.style.display = "none";
+                }
+            }
+        }
+
+        if (typeSelect) {
+            typeSelect.addEventListener("change", toggleAtgFields);
+            toggleAtgFields();
+        }
+    });
+</script>
+{% endblock %}

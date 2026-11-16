@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    لوحة المتابعة - لجنة زرع النخاع وعقار ATG
+{% endblock %}
+
+{% block content %}
+<div class="page page-content">
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="page-header__content">
+            <h1 class="page-title">
+                لجنة زرع النخاع وعقار ATG
+            </h1>
+            <p class="page-subtitle">
+                لوحة متابعة المذكرات المالية وإجراءات الاعتماد وتتبع الحركات
+            </p>
+        </div>
+
+        <div class="page-header__actions">
+            <a href="{% url 'bmt_committee:request_create' %}" class="btn btn-primary">
+                <b>+</b> إعداد طلب ومذكرة جديدة
+            </a>
+            <a href="{% url 'bmt_committee:request_list' %}" class="btn btn-secondary">
+                استعراض كافة الطلبات
+            </a>
+        </div>
+    </header>
+
+    {% if messages %}
+    <div class="messages-container" style="margin-bottom: 1.5rem;">
+        {% for message in messages %}
+        <div class="alert alert--{{ message.tags|default:'info' }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Quick Stats Grid -->
+    <section class="page-section" style="margin-bottom: 2rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+
+            <div class="card" style="padding: 1.25rem; text-align: center; border-top: 4px solid #0f766e;">
+                <div style="font-size: 0.85rem; color: #64748b; font-weight: 600;">إجمالي الطلبات</div>
+                <div style="font-size: 2rem; font-weight: 700; color: #0f766e; margin-top: 0.25rem;">
+                    {{ stats.total }}
+                </div>
+            </div>
+
+            <div class="card" style="padding: 1.25rem; text-align: center; border-top: 4px solid #64748b;">
+                <div style="font-size: 0.85rem; color: #64748b; font-weight: 600;">مسودات قيد التجهيز</div>
+                <div style="font-size: 2rem; font-weight: 700; color: #334155; margin-top: 0.25rem;">
+                    {{ stats.draft }}
+                </div>
+            </div>
+
+            <div class="card" style="padding: 1.25rem; text-align: center; border-top: 4px solid #f59e0b;">
+                <div style="font-size: 0.85rem; color: #b45309; font-weight: 600;">مرسلة للاعتماد</div>
+                <div style="font-size: 2rem; font-weight: 700; color: #d97706; margin-top: 0.25rem;">
+                    {{ stats.sent_for_approval }}
+                </div>
+            </div>
+
+            <div class="card" style="padding: 1.25rem; text-align: center; border-top: 4px solid #10b981;">
+                <div style="font-size: 0.85rem; color: #047857; font-weight: 600;">معتمدة / سارية</div>
+                <div style="font-size: 2rem; font-weight: 700; color: #059669; margin-top: 0.25rem;">
+                    {{ stats.approved }}
+                </div>
+            </div>
+
+            <div class="card" style="padding: 1.25rem; text-align: center; border-top: 4px solid #ef4444;">
+                <div style="font-size: 0.85rem; color: #b91c1c; font-weight: 600;">مرفوضة</div>
+                <div style="font-size: 2rem; font-weight: 700; color: #dc2626; margin-top: 0.25rem;">
+                    {{ stats.rejected }}
+                </div>
+            </div>
+
+            <div class="card" style="padding: 1.25rem; text-align: center; border-top: 4px solid #6366f1;">
+                <div style="font-size: 0.85rem; color: #4338ca; font-weight: 600;">ATG بانتظار التواصل</div>
+                <div style="font-size: 2rem; font-weight: 700; color: #4f46e5; margin-top: 0.25rem;">
+                    {{ stats.atg_pending_contact }}
+                </div>
+            </div>
+
+            <div class="card" style="padding: 1.25rem; text-align: center; border-top: 4px solid #8b5cf6;">
+                <div style="font-size: 0.85rem; color: #6d28d9; font-weight: 600;">ATG بانتظار تسليم الخطاب</div>
+                <div style="font-size: 2rem; font-weight: 700; color: #7c3aed; margin-top: 0.25rem;">
+                    {{ stats.atg_pending_delivery }}
+                </div>
+            </div>
+
+            <div class="card" style="padding: 1.25rem; text-align: center; border-top: 4px solid #0284c7;">
+                <div style="font-size: 0.85rem; color: #0369a1; font-weight: 600;">مكتملة وموجهة</div>
+                <div style="font-size: 2rem; font-weight: 700; color: #0284c7; margin-top: 0.25rem;">
+                    {{ stats.completed }}
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Two-column Section: Recent Requests & Recent Movements -->
+    <div style="display: grid; grid-template-columns: 3fr 2fr; gap: 1.5rem;">
+
+        <!-- Recent Requests -->
+        <section class="card">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem;">
+                <h2 class="card-title" style="margin: 0; font-size: 1.15rem;">أحدث الطلبات والمذكرات</h2>
+                <a href="{% url 'bmt_committee:request_list' %}" style="font-size: 0.85rem; color: #0f766e; text-decoration: none; font-weight: 600;">
+                    عرض الكل &larr;
+                </a>
+            </div>
+
+            <div class="card-body" style="padding: 0;">
+                <div class="data-table__wrapper">
+                    <table class="data-table" style="width: 100%;">
+                        <thead class="data-table__head">
+                            <tr>
+                                <th>كود الطلب</th>
+                                <th>المريض</th>
+                                <th>نوع الإجراء</th>
+                                <th>المبلغ المعتمد</th>
+                                <th>الحالة</th>
+                                <th>إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for req in recent_requests %}
+                            <tr class="data-table__row">
+                                <td class="data-table__cell">
+                                    <strong style="color: #0f766e;">{{ req.request_code }}</strong>
+                                </td>
+                                <td class="data-table__cell">{{ req.patient.full_name }}</td>
+                                <td class="data-table__cell" style="font-size: 0.85rem;">
+                                    {{ req.get_request_type_display }}
+                                </td>
+                                <td class="data-table__cell" style="font-weight: 600;">
+                                    {{ req.approved_amount|floatformat:2 }} ج.م
+                                </td>
+                                <td class="data-table__cell">
+                                    <span class="status {% if req.status == 'APPROVED' or req.status == 'COMPLETED' or req.status == 'LETTER_DELIVERED' %}status-approved{% elif req.status == 'REJECTED' %}status-cancelled{% elif req.status == 'SENT_FOR_APPROVAL' %}status-reviewing{% else %}status-pending{% endif %}">
+                                        {{ req.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="data-table__cell">
+                                    <a href="{% url 'bmt_committee:request_detail' req.pk %}" class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">
+                                        عرض
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 2rem; color: #94a3b8;">
+                                    لا توجد طلبات مسجلة حتى الآن.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Movements Log -->
+        <section class="card">
+            <div class="card-header" style="padding: 1rem 1.5rem;">
+                <h2 class="card-title" style="margin: 0; font-size: 1.15rem;">سجل الحركات الأخيرة</h2>
+            </div>
+
+            <div class="card-body" style="padding: 1rem 1.5rem;">
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    {% for m in recent_movements %}
+                    <div style="border-right: 3px solid #0f766e; padding-right: 0.75rem;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+                            <strong>
+                                <a href="{% url 'bmt_committee:request_detail' m.request.pk %}" style="color: #0f766e; text-decoration: none;">
+                                    {{ m.request.request_code }}
+                                </a>
+                                - {{ m.request.patient.full_name }}
+                            </strong>
+                            <span style="color: #94a3b8; font-size: 0.75rem;">{{ m.moved_at|date:"Y-m-d H:i" }}</span>
+                        </div>
+                        <div style="font-size: 0.85rem; color: #334155; margin-top: 0.25rem;">
+                            <strong>{{ m.get_action_display }}</strong>
+                            {% if m.destination %}
+                            <span style="color: #64748b;">&larr; {{ m.destination }}</span>
+                            {% endif %}
+                        </div>
+                        {% if m.notes %}
+                        <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.2rem; background: #f8fafc; padding: 0.25rem 0.5rem; border-radius: 4px;">
+                            {{ m.notes }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% empty %}
+                    <div style="text-align: center; color: #94a3b8; padding: 1.5rem;">
+                        لا توجد حركات مسجلة حتى الآن.
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+</div>
+{% endblock %}
