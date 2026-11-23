@@ -309,3 +309,40 @@ def record_memo_movement(bmt_request, action, to_status=None, destination="", no
         bmt_request.save(update_fields=["status", "updated_at"])
 
     return movement
+
+
+def get_patient_title(patient):
+    """
+    تحديد لقب المريض بناءً على قانون التأمين والجنس:
+    - مواليد (CID): الطفل (ذكر) / الطفلة (أنثى)
+    - طلبة (STD): الطالب (ذكر) / الطالبة (أنثى)
+    - موظف أو معاش (EMP / RET): المنتفع (ذكر) / المنتفعة (أنثى)
+    """
+    if not patient:
+        return "المنتفع"
+
+    gender = getattr(patient, "gender", "M")
+    law = getattr(patient, "insurance_law", "")
+
+    if law == "CID":
+        return "الطفلة" if gender == "F" else "الطفل"
+    elif law == "STD":
+        return "الطالبة" if gender == "F" else "الطالب"
+    else:
+        return "المنتفعة" if gender == "F" else "المنتفع"
+
+
+def clean_branch_name(branch_display):
+    """
+    إزالة كلمة 'فرع' المكررة إذا كانت الكلمة تبدأ بالفعل بـ 'فرع '
+    لتجنب ظهور تركيبات مثل: 'لفرع فرع بني سويف'
+    بحيث تصبح: 'لفرع بني سويف'
+    أما إذا كانت 'منطقة البحر الاحمر' فتبقى كما هي
+    """
+    if not branch_display:
+        return ""
+    text = str(branch_display).strip()
+    if text.startswith("فرع "):
+        return text[4:].strip()
+    return text
+

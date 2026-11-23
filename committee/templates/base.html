@@ -68,7 +68,14 @@
         <div class="navbar__links">
 
             <a
-                href="{% url 'home' %}"
+                href="{% url 'landing' %}"
+                class="navbar__link"
+            >
+                اختيار اللجنة
+            </a>
+
+            <a
+                href="{% url 'gamma_home' %}"
                 class="navbar__link"
             >
                 الرئيسية
@@ -93,14 +100,6 @@
                 class="navbar__link"
             >
                 التحويلات
-            </a>
-
-            <a
-                href="{% url 'bmt_committee:dashboard' %}"
-                class="navbar__link"
-                style="color: #0f766e; font-weight: 700;"
-            >
-                زرع النخاع و ATG
             </a>
 
         </div>

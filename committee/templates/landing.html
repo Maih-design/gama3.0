@@ -1,0 +1,140 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الإدارة العامة للخدمات الطبية - اختيار اللجنة</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
+        .landing-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .landing-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .landing-header img {
+            width: 110px;
+            height: auto;
+            margin-bottom: 1rem;
+        }
+        .landing-header h1 {
+            font-size: 1.8rem;
+            color: #0f766e;
+            margin: 0 0 0.25rem;
+            font-weight: 800;
+        }
+        .landing-header p {
+            font-size: 1.1rem;
+            color: #475569;
+            margin: 0;
+        }
+        .committees-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 800px;
+            width: 100%;
+        }
+        @media (max-width: 600px) {
+            .committees-grid { grid-template-columns: 1fr; }
+        }
+        .committee-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            border: 2px solid transparent;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        .committee-card:hover {
+            border-color: #0f766e;
+            box-shadow: 0 8px 32px rgba(15,118,110,0.18);
+            transform: translateY(-4px);
+        }
+        .committee-card__icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+        .committee-card--gamma .committee-card__icon {
+            background: #fff7ed;
+        }
+        .committee-card--bmt .committee-card__icon {
+            background: #f0fdf4;
+        }
+        .committee-card__title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #1e293b;
+        }
+        .committee-card__desc {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+        .committee-card--gamma:hover .committee-card__title { color: #c2410c; }
+        .committee-card--bmt:hover .committee-card__title { color: #0f766e; }
+
+        .landing-footer {
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            border-top: 1px solid #e2e8f0;
+            background: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="landing-container">
+        <div class="landing-header">
+            <img src="{% static 'images/logo.png' %}" alt="شعار الهيئة">
+            <h1>الإدارة العامة للخدمات الطبية</h1>
+            <p>الهيئة العامة للتأمين الصحي</p>
+        </div>
+
+        <div class="committees-grid">
+            <a href="{% url 'gamma_home' %}" class="committee-card committee-card--gamma">
+                <div class="committee-card__icon">⚕️</div>
+                <div class="committee-card__title">لجنة الجاما نايف</div>
+                <div class="committee-card__desc">إدارة جلسات وقرارات لجنة الجاما نايف والتحويلات</div>
+            </a>
+
+            <a href="{% url 'bmt_committee:bmt_home' %}" class="committee-card committee-card--bmt">
+                <div class="committee-card__icon">🩺</div>
+                <div class="committee-card__title">اللجنة العليا لزرع النخاع</div>
+                <div class="committee-card__desc">إدارة طلبات ومذكرات زرع النخاع وعقار ATG</div>
+            </a>
+        </div>
+    </div>
+
+    <footer class="landing-footer">
+        نظام الإدارة العامة للخدمات الطبية &mdash; الهيئة العامة للتأمين الصحي
+    </footer>
+</body>
+</html>

@@ -15,6 +15,10 @@ def home(request):
     return render(request, "home.html")
 
 
+def landing(request):
+    return render(request, "landing.html")
+
+
 class PatientListView(LoginRequiredMixin, ListView):
     model = Patient
     template_name = "patients/patient_list.html"

@@ -1,0 +1,113 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}
+            اللجنة العليا لزرع النخاع
+        {% endblock %}
+    </title>
+
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =========================
+         Navbar (BMT Committee)
+    ========================== -->
+    <nav class="navbar no-print">
+
+        <!-- الشعار واسم النظام -->
+        <div class="navbar__brand">
+            <img src="{% static 'images/logo.png' %}" alt="شعار النظام" class="navbar__logo">
+            <div class="navbar__brand-text">
+                <div class="navbar__title">
+                    اللجنة العليا لزرع النخاع
+                </div>
+                <div class="navbar__subtitle">
+                    إدارة مذكرات زرع النخاع وعقار ATG
+                </div>
+            </div>
+        </div>
+
+        <!-- روابط النظام -->
+        <div class="navbar__links">
+            <a href="{% url 'landing' %}" class="navbar__link" style="color: #64748b; font-weight: 700;">
+                اختيار اللجنة
+            </a>
+
+            <a href="{% url 'bmt_committee:bmt_home' %}" class="navbar__link">
+                الرئيسية
+            </a>
+
+            <a href="{% url 'bmt_committee:request_list' %}" class="navbar__link">
+                الطلبات
+            </a>
+
+            <a href="{% url 'bmt_committee:request_create' %}" class="navbar__link">
+                إعداد طلب جديد
+            </a>
+
+            <a href="{% url 'bmt_committee:dashboard' %}" class="navbar__link">
+                لوحة المتابعة
+            </a>
+        </div>
+
+        <!-- المستخدم والإدارة -->
+        <div class="navbar__account">
+            {% if request.user.is_authenticated %}
+                <span class="navbar__user-name">
+                    {{ request.user.get_full_name|default:request.user.username }}
+                </span>
+
+                {% if request.user.is_staff %}
+                    <a href="/admin/" class="navbar__account-link">
+                        الإدارة
+                    </a>
+                {% endif %}
+
+                <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="navbar__account-link navbar__account-link--logout">
+                        تسجيل الخروج
+                    </button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" class="navbar__account-link">
+                    تسجيل الدخول
+                </a>
+            {% endif %}
+        </div>
+
+    </nav>
+
+    <!-- =========================
+        Page Content
+    ========================== -->
+    <main class="app__content">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="app-footer no-print">
+        <div class="app-footer__content">
+            <span>اللجنة العليا لزرع النخاع وعقار ATG</span>
+            <span>الإدارة العامة للخدمات الطبية</span>
+            <span>الهيئة العامة للتأمين الصحي</span>
+        </div>
+    </footer>
+
+</div>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

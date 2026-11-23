@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_bmt.html" %}
 {% load static %}
 
 {% block title %}
@@ -40,46 +40,171 @@
         <form method="post" novalidate style="padding: 1.5rem 2rem;">
             {% csrf_token %}
 
-            <!-- القسم 1: بيانات الحالة والجهة -->
+            {% if is_create %}
+            {{ form.existing_patient_id }}
+
+            <!-- القسم 1: فحص الرقم القومي وبيانات المريض -->
             <div style="border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem; margin-bottom: 1.5rem;">
                 <h3 style="color: #0f766e; margin: 0 0 0.5rem; font-size: 1.15rem;">
-                    1. بيانات المريض ونوع الإجراء
+                    1. بيانات المريض والرقم القومي
                 </h3>
                 <p style="color: #64748b; font-size: 0.85rem; margin: 0;">
-                    حدد المريض المسجل بالنظام ونوع الإجراء والمستشفى المعالج المتعاقد
+                    أدخل الرقم القومي للمريض (14 رقماً) للتحقق من وجوده بالنظام أو تسجيله مباشرة مع الطلب
                 </p>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
-                <div>
-                    <label class="form-label" style="font-weight: 700; margin-bottom: 0.35rem; display: block;">
-                        {{ form.patient.label }} <span style="color: red;">*</span>
-                    </label>
-                    {{ form.patient }}
+            <!-- إدخال الرقم القومي والتحقق -->
+            <div style="margin-bottom: 1.5rem;">
+                <label class="form-label" style="font-weight: 700; margin-bottom: 0.35rem; display: block;">
+                    {{ form.national_id.label }} <span style="color: red;">*</span>
+                </label>
+                <div style="display: flex; gap: 0.75rem; align-items: center; max-width: 550px;">
+                    <div style="flex: 1;">
+                        {{ form.national_id }}
+                    </div>
+                    <button type="button" id="btn-check-nid" class="btn btn-secondary" style="padding: 0.55rem 1.25rem; font-weight: 600; white-space: nowrap;">
+                        🔍 تحقق من الرقم القومي
+                    </button>
                 </div>
+                <div id="nid-spinner" style="display: none; color: #0f766e; font-size: 0.85rem; margin-top: 0.35rem;">
+                    جاري التحقق من الرقم القومي...
+                </div>
+            </div>
 
+            <!-- كارت المريض المسجل بالنظام (يظهر عند العثور عليه) -->
+            <div id="existing-patient-card" style="display: none; background: #f0fdf4; border: 2px solid #86efac; border-radius: 10px; padding: 1.25rem; margin-bottom: 1.75rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 1.25rem; color: #16a34a; font-weight: 800;">✓</span>
+                        <strong style="color: #166534; font-size: 1.05rem;">مريض مسجل مسبقاً بالنظام</strong>
+                    </div>
+                    <span class="badge" style="background: #bbf7d0; color: #166534; padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">
+                        ملف معتمد وموحد
+                    </span>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; font-size: 0.9rem; color: #1e293b;">
+                    <div><span style="color: #64748b;">اسم المريض:</span> <strong id="exist-p-name">-</strong></div>
+                    <div><span style="color: #64748b;">الرقم القومي:</span> <strong id="exist-p-nid">-</strong></div>
+                    <div><span style="color: #64748b;">النوع:</span> <strong id="exist-p-gender">-</strong></div>
+                    <div><span style="color: #64748b;">قانون التأمين:</span> <strong id="exist-p-law">-</strong></div>
+                    <div><span style="color: #64748b;">الرقم التأميني:</span> <strong id="exist-p-ins">-</strong></div>
+                    <div><span style="color: #64748b;">الفرع التابع:</span> <strong id="exist-p-branch">-</strong></div>
+                    <div><span style="color: #64748b;">الهاتف:</span> <strong id="exist-p-phone">-</strong></div>
+                </div>
+                <div style="margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px dashed #bbf7d0; font-size: 0.85rem;">
+                    <span style="color: #64748b;">التشخيص المسجل:</span> <span id="exist-p-diag" style="color: #334155; font-weight: 600;">-</span>
+                </div>
+            </div>
+
+            <!-- قسم تسجيل مريض جديد (يظهر إذا لم يكن المريض مسجلاً) -->
+            <div id="new-patient-container" style="display: none; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 10px; padding: 1.5rem; margin-bottom: 1.75rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <span style="font-size: 1.25rem;">➕</span>
+                    <h4 style="margin: 0; color: #0f766e; font-size: 1.05rem;">تسجيل ملف مريض جديد بالنظام</h4>
+                </div>
+                <p style="color: #64748b; font-size: 0.85rem; margin: 0 0 1.25rem;">
+                    المريض غير مسجل مسبقاً. أدخل البيانات التالية لإنشاء ملف المريض المشترك مع الطلب في معاملة واحدة:
+                </p>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div style="grid-column: span 2;">
+                        <label class="form-label" style="font-weight: 700; margin-bottom: 0.35rem; display: block;">
+                            {{ form.full_name.label }} <span style="color: red;">*</span>
+                        </label>
+                        {{ form.full_name }}
+                    </div>
+
+                    <div>
+                        <label class="form-label" style="font-weight: 700; margin-bottom: 0.35rem; display: block;">
+                            {{ form.gender.label }} <span style="color: red;">*</span>
+                        </label>
+                        {{ form.gender }}
+                    </div>
+
+                    <div>
+                        <label class="form-label" style="font-weight: 700; margin-bottom: 0.35rem; display: block;">
+                            {{ form.insurance_law.label }} <span style="color: red;">*</span>
+                        </label>
+                        {{ form.insurance_law }}
+                    </div>
+
+                    <div>
+                        <label class="form-label" style="font-weight: 700; margin-bottom: 0.35rem; display: block;">
+                            {{ form.insurance_number.label }} <span style="color: red;">*</span>
+                        </label>
+                        {{ form.insurance_number }}
+                    </div>
+
+                    <div>
+                        <label class="form-label" style="font-weight: 700; margin-bottom: 0.35rem; display: block;">
+                            {{ form.affiliated_branch.label }} <span style="color: red;">*</span>
+                        </label>
+                        {{ form.affiliated_branch }}
+                    </div>
+
+                    <div style="grid-column: span 2;">
+                        <label class="form-label" style="font-weight: 600; margin-bottom: 0.35rem; display: block;">
+                            {{ form.phone_number.label }}
+                        </label>
+                        {{ form.phone_number }}
+                    </div>
+
+                    <div style="grid-column: span 2;">
+                        <label class="form-label" style="font-weight: 700; margin-bottom: 0.35rem; display: block;">
+                            {{ form.diagnosis.label }} <span style="color: red;">*</span>
+                        </label>
+                        {{ form.diagnosis }}
+                    </div>
+                </div>
+            </div>
+
+            {% else %}
+            <!-- في حالة التعديل: عرض بيانات المريض كقراءة فقط -->
+            <div style="border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                <h3 style="color: #0f766e; margin: 0 0 0.5rem; font-size: 1.15rem;">
+                    1. بيانات المريض
+                </h3>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem 1.25rem; font-size: 0.95rem;">
+                    <strong>{{ bmt_request.patient.full_name }}</strong> &mdash;
+                    الرقم القومي: <span style="font-family: monospace;">{{ bmt_request.patient.national_id }}</span> &mdash;
+                    الفرع: <span>{{ bmt_request.patient.get_affiliated_branch_display }}</span> &mdash;
+                    قانون التأمين: <span>{{ bmt_request.patient.get_insurance_law_display }}</span>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- القسم 2: بيانات الإجراء والمستشفى -->
+            <div style="border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem; margin-bottom: 1.5rem; margin-top: 1.5rem;">
+                <h3 style="color: #0f766e; margin: 0 0 0.5rem; font-size: 1.15rem;">
+                    2. نوع الإجراء والمستشفى المعالج
+                </h3>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
+                {% if is_create %}
                 <div>
                     <label class="form-label" style="font-weight: 700; margin-bottom: 0.35rem; display: block;">
                         {{ form.request_type.label }} <span style="color: red;">*</span>
                     </label>
                     {{ form.request_type }}
                 </div>
+                {% endif %}
 
-                <div style="grid-column: span 2;">
+                <div {% if not is_create %}style="grid-column: span 2;"{% endif %}>
                     <label class="form-label" style="font-weight: 700; margin-bottom: 0.35rem; display: block;">
                         {{ form.hospital.label }} <span style="color: red;">*</span>
                     </label>
                     {{ form.hospital }}
                     <small style="color: #64748b; display: block; margin-top: 0.25rem;">
-                        تظهر هنا فقط المستشفيات والمراكز المعتمدة والمفعلة للجنة زرع النخاع
+                        المستشفيات والمراكز المعتمدة لزرع النخاع
                     </small>
                 </div>
             </div>
 
-            <!-- القسم 2: حقل وزن المريض الخاص بـ ATG -->
+            <!-- حقل وزن المريض الخاص بـ ATG -->
             <div id="atg_fields_container" style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem; display: none;">
                 <h4 style="color: #166534; margin: 0 0 0.5rem; font-size: 1rem;">
-                    بيانات حساب جرعة عقار ATG التحضيري
+                    بيانات حساب جرعة وتكلفة عقار ATG التحضيري
                 </h4>
                 <p style="color: #15803d; font-size: 0.85rem; margin-bottom: 1rem;">
                     يحسب النظام الجرعة تلقائياً بمعدل 21 مجم/كجم وتقريب عدد الأمبولات لأعلى بسعر الأمبول الرسمي (15,722.50 ج.م).
@@ -93,14 +218,11 @@
                 </div>
             </div>
 
-            <!-- القسم 3: السياق الطبي والموافقات السابقة بملف المريض -->
+            <!-- القسم 3: السياق الطبي والموافقات السابقة -->
             <div style="border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem; margin-bottom: 1.5rem; margin-top: 2rem;">
                 <h3 style="color: #0f766e; margin: 0 0 0.5rem; font-size: 1.15rem;">
-                    2. الموافقات الطبية والتقارير الواردة بملف المريض
+                    3. الموافقات والتقارير الطبية الواردة
                 </h3>
-                <p style="color: #64748b; font-size: 0.85rem; margin: 0;">
-                    البيانات والموافقات السابقة الواردة من اللجان المتخصصة والمستشفيات للتوثيق بالمذكرة
-                </p>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
@@ -137,7 +259,7 @@
                         {{ form.hospital_initial_cost.label }}
                     </label>
                     {{ form.hospital_initial_cost }}
-                    <small style="color: #64748b;">(خاص بحالات نصف المتوافق مثل إفادة المستشفى بـ 700 ألف ج)</small>
+                    <small style="color: #64748b;">(لحالات نصف المتوافق)</small>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
@@ -159,7 +281,7 @@
             <!-- القسم 4: المذكرة والدفاتر -->
             <div style="border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem; margin-bottom: 1.5rem; margin-top: 2rem;">
                 <h3 style="color: #0f766e; margin: 0 0 0.5rem; font-size: 1.15rem;">
-                    3. بيانات العرض والتوثيق الدفتري
+                    4. التوثيق والدفاتر
                 </h3>
             </div>
 
@@ -201,26 +323,93 @@
 
 </div>
 
-<!-- Vanilla JS لإظهار حقول ATG تلقائياً عند اختيار نوع الطلب -->
+<!-- JavaScript للتحقق اللحظي من الرقم القومي وتغيير حقول ATG -->
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const typeSelect = document.getElementById("id_request_type");
-        const atgContainer = document.getElementById("atg_fields_container");
+document.addEventListener("DOMContentLoaded", function () {
+    // 1. تبديل حقول ATG
+    const typeSelect = document.getElementById("id_request_type");
+    const atgContainer = document.getElementById("atg_fields_container");
 
-        function toggleAtgFields() {
-            if (typeSelect && atgContainer) {
-                if (typeSelect.value === "ATG") {
-                    atgContainer.style.display = "block";
-                } else {
-                    atgContainer.style.display = "none";
-                }
+    function toggleAtgFields() {
+        if (typeSelect && atgContainer) {
+            if (typeSelect.value === "ATG") {
+                atgContainer.style.display = "block";
+            } else {
+                atgContainer.style.display = "none";
             }
         }
+    }
 
-        if (typeSelect) {
-            typeSelect.addEventListener("change", toggleAtgFields);
-            toggleAtgFields();
+    if (typeSelect) {
+        typeSelect.addEventListener("change", toggleAtgFields);
+        toggleAtgFields();
+    }
+
+    // 2. التحقق من الرقم القومي
+    const nidInput = document.getElementById("id_national_id");
+    const checkBtn = document.getElementById("btn-check-nid");
+    const spinner = document.getElementById("nid-spinner");
+    const existCard = document.getElementById("existing-patient-card");
+    const newContainer = document.getElementById("new-patient-container");
+    const existingIdInput = document.getElementById("id_existing_patient_id");
+
+    if (nidInput && checkBtn) {
+        function checkNationalId() {
+            const nid = nidInput.value.trim();
+            if (nid.length !== 14 || !/^\d+$/.test(nid)) {
+                if (nid.length > 0) {
+                    alert("الرقم القومي يجب أن يتكون من 14 رقماً صحيحاً.");
+                }
+                return;
+            }
+
+            if (spinner) spinner.style.display = "block";
+
+            fetch("{% url 'bmt_committee:patient_lookup' %}?national_id=" + encodeURIComponent(nid))
+                .then(response => response.json())
+                .then(data => {
+                    if (spinner) spinner.style.display = "none";
+                    if (data.found && data.patient) {
+                        // إظهار كارت المريض المسجل
+                        document.getElementById("exist-p-name").textContent = data.patient.full_name;
+                        document.getElementById("exist-p-nid").textContent = data.patient.national_id;
+                        document.getElementById("exist-p-gender").textContent = data.patient.gender_display;
+                        document.getElementById("exist-p-law").textContent = data.patient.insurance_law_display;
+                        document.getElementById("exist-p-ins").textContent = data.patient.insurance_number;
+                        document.getElementById("exist-p-branch").textContent = data.patient.affiliated_branch_display;
+                        document.getElementById("exist-p-phone").textContent = data.patient.phone_number || "غير مسجل";
+                        document.getElementById("exist-p-diag").textContent = data.patient.diagnosis;
+
+                        existCard.style.display = "block";
+                        newContainer.style.display = "none";
+                        if (existingIdInput) existingIdInput.value = data.patient.id;
+                    } else {
+                        // المريض غير مسجل: إظهار نموذج تسجيل المريض الجديد
+                        existCard.style.display = "none";
+                        newContainer.style.display = "block";
+                        if (existingIdInput) existingIdInput.value = "";
+                    }
+                })
+                .catch(err => {
+                    if (spinner) spinner.style.display = "none";
+                    console.error("Error looking up national id:", err);
+                });
         }
-    });
+
+        checkBtn.addEventListener("click", checkNationalId);
+
+        // فحص تلقائي عند إدخال 14 رقماً
+        nidInput.addEventListener("input", function() {
+            if (nidInput.value.trim().length === 14) {
+                checkNationalId();
+            }
+        });
+
+        // تشغيل الفحص عند تحميل الصفحة إذا كان الحقل ممتلئاً (مثلاً بعد خطأ في النموذج)
+        if (nidInput.value.trim().length === 14) {
+            checkNationalId();
+        }
+    }
+});
 </script>
 {% endblock %}

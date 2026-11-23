@@ -1,0 +1,96 @@
+{% extends "base_bmt.html" %}
+{% load static %}
+
+{% block title %}
+    الرئيسية - اللجنة العليا لزرع النخاع
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="home-page page-content">
+
+    <header class="page-header home-page__header">
+        <div class="page-header__content">
+            <h1 class="page-title" style="color: #0f766e;">
+                اللجنة العليا لزرع النخاع
+            </h1>
+            <p class="page-subtitle">
+                إدارة طلبات ومذكرات زرع النخاع العظمي وعقار ATG والموافقات المالية
+            </p>
+        </div>
+    </header>
+
+    <!-- بطاقات الإحصائيات السريعة -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+        <div class="card" style="padding: 1.25rem; text-align: center; border-top: 4px solid #0f766e;">
+            <div style="font-size: 2rem; font-weight: 800; color: #0f766e;">{{ quick_stats.total }}</div>
+            <div style="font-size: 0.9rem; color: #475569; font-weight: 600;">إجمالي الطلبات المسجلة</div>
+        </div>
+        <div class="card" style="padding: 1.25rem; text-align: center; border-top: 4px solid #ca8a04;">
+            <div style="font-size: 2rem; font-weight: 800; color: #ca8a04;">{{ quick_stats.draft }}</div>
+            <div style="font-size: 0.9rem; color: #475569; font-weight: 600;">مذكرات قيد التجهيز</div>
+        </div>
+        <div class="card" style="padding: 1.25rem; text-align: center; border-top: 4px solid #0284c7;">
+            <div style="font-size: 2rem; font-weight: 800; color: #0284c7;">{{ quick_stats.sent_for_approval }}</div>
+            <div style="font-size: 0.9rem; color: #475569; font-weight: 600;">مرسلة للاعتماد</div>
+        </div>
+        <div class="card" style="padding: 1.25rem; text-align: center; border-top: 4px solid #4f46e5;">
+            <div style="font-size: 2rem; font-weight: 800; color: #4f46e5;">{{ quick_stats.pending_handover }}</div>
+            <div style="font-size: 0.9rem; color: #475569; font-weight: 600;">ATG بانتظار التسليم للخدمة الاجتماعية</div>
+        </div>
+    </div>
+
+    <!-- البطاقات الرئيسية للتنقل -->
+    <section class="dashboard home-dashboard">
+        <div class="home-grid">
+
+            <a href="{% url 'bmt_committee:request_list' %}" class="card home-card" style="border-top: 4px solid #0f766e;">
+                <div class="card-body">
+                    <div class="home-card__image" style="font-size: 2.75rem; text-align: center; padding: 0.5rem 0;">
+                        📋
+                    </div>
+                    <h2 class="home-card-title" style="color: #0f766e;">
+                        قائمة الطلبات
+                    </h2>
+                    <p class="home-card-subtitle">
+                        عرض وبحث وفرز كافة مذكرات وطلبات زرع النخاع وعقار ATG.
+                    </p>
+                </div>
+            </a>
+
+            <a href="{% url 'bmt_committee:request_create' %}" class="card home-card" style="border-top: 4px solid #16a34a;">
+                <div class="card-body">
+                    <div class="home-card__image" style="font-size: 2.75rem; text-align: center; padding: 0.5rem 0;">
+                        ➕
+                    </div>
+                    <h2 class="home-card-title" style="color: #16a34a;">
+                        إعداد طلب جديد
+                    </h2>
+                    <p class="home-card-subtitle">
+                        تسجيل طلب ومذكرة عرض مالية جديدة مع فحص وتسجيل المريض بالرقم القومي.
+                    </p>
+                </div>
+            </a>
+
+            <a href="{% url 'bmt_committee:dashboard' %}" class="card home-card" style="border-top: 4px solid #0284c7;">
+                <div class="card-body">
+                    <div class="home-card__image" style="font-size: 2.75rem; text-align: center; padding: 0.5rem 0;">
+                        📊
+                    </div>
+                    <h2 class="home-card-title" style="color: #0284c7;">
+                        لوحة المتابعة
+                    </h2>
+                    <p class="home-card-subtitle">
+                        متابعة إحصائيات الحالات والمذكرات والجدول الزمني للحركات الأخيرة.
+                    </p>
+                </div>
+            </a>
+
+        </div>
+    </section>
+
+</main>
+{% endblock %}

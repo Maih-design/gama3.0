@@ -65,11 +65,11 @@
             <div class="memo-section-title">الموضوع: -</div>
             <div class="memo-section-body">
                 {% if request_obj.request_type == 'ATG' %}
-                بشأن الطلب المقدم من ولي أمر الطفل / <strong>{{ request_obj.patient.full_name }}</strong> ت.ص. رقم / <strong>{{ request_obj.patient.insurance_number }}</strong> التابع لفرع <strong>{{ request_obj.patient.get_affiliated_branch_display }}</strong> الموافقة على صرف العلاج التحضيري لعملية زرع النخاع ATG (Grafolon) الوزن <strong>{{ request_obj.patient_weight|floatformat:0 }}</strong> كيلو.
+                بشأن الطلب المقدم من ولي أمر {{ patient_title }} / <strong>{{ request_obj.patient.full_name }}</strong> ت.ص. رقم / <strong>{{ request_obj.patient.insurance_number }}</strong> التابع لفرع <strong>{{ branch_name_clean }}</strong> الموافقة على صرف العلاج التحضيري لعملية زرع النخاع ATG (Grafolon) الوزن <strong>{{ request_obj.patient_weight|floatformat:0 }}</strong> كيلو.
                 {% elif request_obj.request_type == 'HAPLOIDENTICAL' %}
-                بشأن الموافقة على إجراء عملية زرع نخاع عظمى من متبرع نصف متوافق بتكلفة إجمالية بمبلغ <strong>280000</strong> (مئتان وثمانون ألف جنيهاً فقط لا غير) بمستشفى <strong>{{ request_obj.hospital.name }}</strong> للطالب / <strong>{{ request_obj.patient.full_name }}</strong> ت.ص رقم-: / <strong>{{ request_obj.patient.insurance_number }}</strong> التابع لفرع <strong>{{ request_obj.patient.get_affiliated_branch_display }}</strong>.
+                بشأن الموافقة على إجراء عملية زرع نخاع عظمى من متبرع نصف متوافق بتكلفة إجمالية بمبلغ <strong>280000</strong> (مئتان وثمانون ألف جنيهاً فقط لا غير) بمستشفى <strong>{{ request_obj.hospital.name }}</strong> لـ{{ patient_title }} / <strong>{{ request_obj.patient.full_name }}</strong> ت.ص رقم-: / <strong>{{ request_obj.patient.insurance_number }}</strong> التابع لفرع <strong>{{ branch_name_clean }}</strong>.
                 {% else %}
-                بشأن الموافقة على استخراج أمر دفع بمبلغ <strong>{{ request_obj.approved_amount|floatformat:0 }}</strong> جنيه ({{ request_obj.amount_in_words }}) قيمة إجراء عملية {{ request_obj.get_request_type_display }} للمنتفعة/للمريض <strong>{{ request_obj.patient.full_name }}</strong> ت.ص رقم/ <strong>{{ request_obj.patient.insurance_number }}</strong> التابع لفرع <strong>{{ request_obj.patient.get_affiliated_branch_display }}</strong>.
+                بشأن الموافقة على استخراج أمر دفع بمبلغ <strong>{{ request_obj.approved_amount|floatformat:0 }}</strong> جنيه ({{ request_obj.amount_in_words }}) قيمة إجراء عملية {{ request_obj.get_request_type_display }} لـ{{ patient_title }} / <strong>{{ request_obj.patient.full_name }}</strong> ت.ص رقم/ <strong>{{ request_obj.patient.insurance_number }}</strong> التابع لفرع <strong>{{ branch_name_clean }}</strong>.
                 {% endif %}
             </div>
 
@@ -85,7 +85,7 @@
                     - المريض المذكور يعاني من ({{ request_obj.patient.diagnosis }}) ويحتاج إلى إجراء عملية زرع نخاع عظمى من متبرع متوافق كلياً.
                 </div>
                 <div class="memo-bullet-point">
-                    - تقدم ولي الأمر بإفادة من مستشفى {{ request_obj.hospital.name }} بأن الطالب يحتاج إلى <strong>{{ request_obj.atg_dose_ampules }}</strong> أمبول عقار Grafolon (Rabbit ATG) تركيز الأمبول 100 ميلجرام وذلك لعدم توافر العقار بمنظومة الشراء الموحد.
+                    - تقدم ولي الأمر بإفادة من مستشفى {{ request_obj.hospital.name }} بأن {{ patient_title }} يحتاج إلى <strong>{{ request_obj.atg_dose_ampules }}</strong> أمبول عقار Grafolon (Rabbit ATG) تركيز الأمبول 100 ميلجرام وذلك لعدم توافر العقار بمنظومة الشراء الموحد.
                 </div>
                 <div class="memo-bullet-point">
                     - مرفق إفادة من مستشفى {{ request_obj.hospital.name }} أن إجمالي الجرعة المطلوبة للمريض هو 21 مليجرام/كجم في حال استخدام عقار جرافالون (Rabbit ATG) (مرفق الإفادة).
@@ -106,7 +106,7 @@
                     - حصل المريض على إفادة من مستشفى {{ request_obj.hospital.name }} بالموافقة على إجراء عملية زرع نخاع عظمى من متبرع نصف متوافق بتكلفة {{ request_obj.hospital_initial_cost|default:700000|floatformat:0 }}ج (سبعمائة ألف جنيهاً فقط لا غير).
                 </div>
                 <div class="memo-bullet-point">
-                    - بناءً على موافقة السيد الدكتور/ رئيس مجلس الإدارة على إجراء عمليات زرع النخاع من متبرع نصف متوافق بمبلغ 280000ج (كصفقة شاملة الإقامة والأدوية والعلاج التحضيري) بتاريخ 2024/9/18.
+                    - بناءً على موافقة السيد الدكتور/ رئيس مجلس الإدارة على إجراء عمليات زرع النخاع من متبرع نصف متوافق (موافقة زرع النخاع نصف توافق بتاريخ 18/9/2024) بمبلغ 280000ج (كصفقة شاملة الإقامة والأدوية والعلاج التحضيري).
                 </div>
                 <div class="memo-bullet-point">
                     - تم توقيع ولي الأمر ({% if request_obj.guardian_name %}{{ request_obj.guardian_relation|default:"الأب" }}{% else %}الأب{% endif %}) إقرار بأنه لن يطالب الهيئة بأي مصاريف تزيد عن 280000 ج بعد موافقة الهيئة.
@@ -118,7 +118,7 @@
                     - تم عرض المريض على {{ request_obj.referring_clinic_or_committee|default:"لجنة أمراض الدم" }} حيث إنه يعاني من {{ request_obj.patient.diagnosis }} وأوصت اللجنة بتحويله إلى إحدى المراكز المتعاقدة لعمل عملية {{ request_obj.get_request_type_display }}{% if request_obj.hla_lab_name %} بعد ما أجريت له تحاليل توافق الأنسجة بمعمل {{ request_obj.hla_lab_name }}{% endif %}.
                 </div>
                 <div class="memo-bullet-point">
-                    - بناءً على موافقة السيد الدكتور/ رئيس مجلس إدارة الهيئة العامة للتأمين الصحي على إجراء عمليات {{ request_obj.get_request_type_display }} بمستشفى {{ request_obj.hospital.name }} بمبلغ {{ request_obj.approved_amount|floatformat:0 }}ج{% if request_obj.payment_type == 'TWO_INSTALLMENTS' %} بالنسبة للدفع يتم على دفعتين كالتالي:
+                    - بناءً على موافقة السيد الدكتور/ رئيس مجلس إدارة الهيئة العامة للتأمين الصحي على إجراء عمليات {{ request_obj.get_request_type_display }} (موافقة زرع النخاع الذاتي والتوافق الكلي بتاريخ 16/1/2018) بمستشفى {{ request_obj.hospital.name }} بمبلغ {{ request_obj.approved_amount|floatformat:0 }}ج{% if request_obj.payment_type == 'TWO_INSTALLMENTS' %} بالنسبة للدفع يتم على دفعتين كالتالي:
                     <div style="padding-right: 1.5rem; margin-top: 0.35rem;">
                         <div>- الدفعة الأولى: بالدفع الإلكتروني بمبلغ <strong>{{ request_obj.installment_1|floatformat:0 }}</strong> جنية (أربعون ألف جنيهاً)</div>
                         <div>- الدفعة الثانية: بالدفع الإلكتروني بباقي المبلغ بقيمة <strong>{{ request_obj.installment_2|floatformat:0 }}</strong> (مائة وعشرة آلاف جنيهاً) عند الدخول لإجراء الزرع.</div>
@@ -136,14 +136,14 @@
             <div class="memo-section-body">
 
                 {% if request_obj.request_type == 'ATG' %}
-                ربما ترون سيادتكم الموافقة على صرف عدد <strong>{{ request_obj.atg_dose_ampules }}</strong> أمبول عقار ATG (Rabbit) تركيز الأمبول 100 مليجرام كعلاج تحضيري لإجراء عملية زرع نخاع عظمى من متبرع متوافق بمستشفى <strong>{{ request_obj.hospital.name }}</strong> بإجمالي تكلفة <strong>{{ request_obj.approved_amount|floatformat:2 }}</strong> ج ({{ request_obj.amount_in_words }}) وذلك خصماً على فرع ({{ request_obj.patient.get_affiliated_branch_display }}).
+                ربما ترون سيادتكم الموافقة على صرف عدد <strong>{{ request_obj.atg_dose_ampules }}</strong> أمبول عقار ATG (Rabbit) تركيز الأمبول 100 مليجرام كعلاج تحضيري لإجراء عملية زرع نخاع عظمى من متبرع متوافق بمستشفى <strong>{{ request_obj.hospital.name }}</strong> بإجمالي تكلفة <strong>{{ request_obj.approved_amount|floatformat:2 }}</strong> ج ({{ request_obj.amount_in_words }}) وذلك خصماً على فرع ({{ branch_name_clean }}).
 
                 {% elif request_obj.request_type == 'HAPLOIDENTICAL' %}
                 معروض على سيادتكم للتكرم بالموافقة على إجراء عملية زرع نخاع عظمى من متبرع نصف متوافق (كصفقة شاملة الإقامة والأدوية والعلاج التحضيري بعقار ATG) وذلك بتكلفة إجمالية وقدرها <strong>280000</strong>ج (مئتان وثمانون ألف جنيهاً فقط لا غير) بمستشفى <strong>{{ request_obj.hospital.name }}</strong> وعلى أن يتم استخراج إذن الدفع بالمبلغ لصالح المستشفى من رئاسة الهيئة كدفع مقدم.
                 <div style="margin-top: 0.4rem; text-align: center; font-weight: 700;">والأمر مفوض لسيادتكم</div>
 
                 {% else %}
-                ربما ترون سيادتكم التكرم بالموافقة على استخراج أمر دفع {% if request_obj.payment_type == 'TWO_INSTALLMENTS' %}بإجمالي <strong>{{ request_obj.approved_amount|floatformat:0 }}</strong>ج ({{ request_obj.amount_in_words }}) على أن تكون على دفعتين{% else %}بمبلغ <strong>{{ request_obj.approved_amount|floatformat:0 }}</strong>ج ({{ request_obj.amount_in_words }}){% endif %} باسم مستشفى <strong>{{ request_obj.hospital.name }}</strong> قيمة إجراء عملية {{ request_obj.get_request_type_display }} للمنتفع المذكور وخصماً على حساب فرع <strong>{{ request_obj.patient.get_affiliated_branch_display }}</strong> ويمكن تعديل قرار اللجنة بنفس القيمة إلى أي جهة متعاقدة يرغب بها المنتفع.
+                ربما ترون سيادتكم التكرم بالموافقة على استخراج أمر دفع {% if request_obj.payment_type == 'TWO_INSTALLMENTS' %}بإجمالي <strong>{{ request_obj.approved_amount|floatformat:0 }}</strong>ج ({{ request_obj.amount_in_words }}) على أن تكون على دفعتين{% else %}بمبلغ <strong>{{ request_obj.approved_amount|floatformat:0 }}</strong>ج ({{ request_obj.amount_in_words }}){% endif %} باسم مستشفى <strong>{{ request_obj.hospital.name }}</strong> قيمة إجراء عملية {{ request_obj.get_request_type_display }} لـ{{ patient_title }} المذكور{% if request_obj.patient.gender == 'F' %}ة{% endif %} وخصماً على حساب فرع <strong>{{ branch_name_clean }}</strong> ويمكن تعديل قرار اللجنة بنفس القيمة إلى أي جهة متعاقدة يرغب بها {{ patient_title }}.
                 {% endif %}
 
             </div>

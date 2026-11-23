@@ -19,6 +19,28 @@ from .operations import can_change_hospital, record_memo_movement
 
 
 @login_required
+def bmt_home(request):
+    """
+    الصفحة الرئيسية للجنة العليا لزرع النخاع
+    """
+    requests_qs = BmtRequest.objects.all()
+    quick_stats = {
+        "total": requests_qs.count(),
+        "draft": requests_qs.filter(status=RequestStatus.DRAFT).count(),
+        "sent_for_approval": requests_qs.filter(status=RequestStatus.SENT_FOR_APPROVAL).count(),
+        "pending_handover": requests_qs.filter(
+            request_type=RequestType.ATG,
+            status=RequestStatus.PENDING_SOCIAL_SERVICES
+        ).count(),
+    }
+    return render(
+        request,
+        "bmt_committee/bmt_home.html",
+        {"quick_stats": quick_stats}
+    )
+
+
+@login_required
 def dashboard(request):
     """
     لوحة تحكم لجنة زرع النخاع وعقار ATG
@@ -425,10 +447,15 @@ def memo_print(request, pk):
     (زرع نخاع ذاتي / متطابق / نصف متوافق / عقار ATG)
     """
     from django.utils import timezone
+    from .operations import get_patient_title, clean_branch_name
     bmt_request = get_object_or_404(
         BmtRequest.objects.select_related("patient", "hospital"),
         pk=pk
     )
+
+    patient_title = get_patient_title(bmt_request.patient)
+    branch_display = bmt_request.patient.get_affiliated_branch_display()
+    branch_name_clean = clean_branch_name(branch_display)
 
     return render(
         request,
@@ -436,6 +463,43 @@ def memo_print(request, pk):
         {
             "request_obj": bmt_request,
             "today_date": timezone.now().date(),
+            "patient_title": patient_title,
+            "branch_name_clean": branch_name_clean,
         }
     )
+
+
+@login_required
+def patient_lookup(request):
+    """
+    البحث الفوري عن المريض بالرقم القومي (AJAX API)
+    """
+    from django.http import JsonResponse
+    from committee.models import Patient
+
+    nid = request.GET.get("national_id", "").strip()
+    if not nid or len(nid) != 14 or not nid.isdigit():
+        return JsonResponse({"found": False, "error": "الرقم القومي غير صحيح"})
+
+    patient = Patient.objects.filter(national_id=nid).first()
+    if patient:
+        return JsonResponse({
+            "found": True,
+            "patient": {
+                "id": patient.pk,
+                "full_name": patient.full_name,
+                "national_id": patient.national_id,
+                "gender": patient.gender,
+                "gender_display": patient.get_gender_display(),
+                "insurance_law": patient.insurance_law,
+                "insurance_law_display": patient.get_insurance_law_display(),
+                "insurance_number": patient.insurance_number,
+                "affiliated_branch": patient.affiliated_branch,
+                "affiliated_branch_display": patient.get_affiliated_branch_display(),
+                "phone_number": patient.phone_number or "",
+                "diagnosis": patient.diagnosis,
+            }
+        })
+    return JsonResponse({"found": False})
+
 

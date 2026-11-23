@@ -3,7 +3,8 @@ from . import views
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    path("", views.home, name="home"),
+    path("", views.landing, name="landing"),
+    path("gamma/", views.home, name="gamma_home"),
     path("patients/", views.PatientListView.as_view(), name="patient_list"),
     path("patients/add/", views.patient_create, name="patient_create"),
     path("patients/<int:pk>/", views.patient_detail, name="patient_detail"),

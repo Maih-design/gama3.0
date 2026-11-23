@@ -1,7 +1,9 @@
 from decimal import Decimal
 from django import forms
 from django.core.exceptions import ValidationError
+from django.db import transaction
 
+from committee.constants import Branches, Gender, InsuranceLaw
 from committee.models import Patient, ReferralCenter
 from .constants import MovementAction, PaymentType, RequestStatus, RequestType
 from .models import BmtRequest, HospitalServicePrice
@@ -29,11 +31,62 @@ class BaseStyledForm(forms.ModelForm):
 
 
 class BmtRequestCreateForm(BaseStyledForm):
-    patient = forms.ModelChoiceField(
-        queryset=Patient.objects.all().order_by("full_name"),
-        label="المريض",
-        empty_label="-- اختر المريض --",
+    # National ID lookup & registration
+    national_id = forms.CharField(
+        max_length=14,
+        min_length=14,
+        label="الرقم القومي للمريض (14 رقماً)",
+        widget=forms.TextInput(attrs={
+            "placeholder": "أدخل الرقم القومي للمريض المكون من 14 رقماً",
+            "maxlength": "14",
+            "autocomplete": "off",
+        }),
     )
+    existing_patient_id = forms.IntegerField(
+        widget=forms.HiddenInput,
+        required=False
+    )
+
+    # New patient registration fields (used if patient is not already registered)
+    full_name = forms.CharField(
+        max_length=200,
+        label="اسم المريض بالكامل",
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": "اسم المريض رباعياً"}),
+    )
+    gender = forms.ChoiceField(
+        choices=[("", "-- اختر النوع --")] + list(Gender.choices),
+        label="النوع",
+        required=False,
+    )
+    insurance_law = forms.ChoiceField(
+        choices=[("", "-- اختر قانون التأمين --")] + list(InsuranceLaw.choices),
+        label="قانون التأمين",
+        required=False,
+    )
+    insurance_number = forms.CharField(
+        max_length=20,
+        label="الرقم التأميني",
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": "الرقم التأميني للمريض"}),
+    )
+    affiliated_branch = forms.ChoiceField(
+        choices=[("", "-- اختر الفرع التابع له --")] + list(Branches.choices),
+        label="الفرع التابع له",
+        required=False,
+    )
+    phone_number = forms.CharField(
+        max_length=20,
+        label="رقم الهاتف",
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": "رقم هاتف المريض أو ولي الأمر"}),
+    )
+    diagnosis = forms.CharField(
+        label="التشخيص الطبي",
+        required=False,
+        widget=forms.Textarea(attrs={"placeholder": "التشخيص الطبي وتفاصيل الحالة", "rows": 2}),
+    )
+
     hospital = forms.ModelChoiceField(
         queryset=ReferralCenter.objects.filter(for_bone_marrow=True).order_by("name"),
         label="المستشفى / المركز المعالج",
@@ -43,7 +96,6 @@ class BmtRequestCreateForm(BaseStyledForm):
     class Meta:
         model = BmtRequest
         fields = [
-            "patient",
             "request_type",
             "hospital",
             "referring_clinic_or_committee",
@@ -84,8 +136,36 @@ class BmtRequestCreateForm(BaseStyledForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        national_id = (cleaned_data.get("national_id") or "").strip()
         request_type = cleaned_data.get("request_type")
         patient_weight = cleaned_data.get("patient_weight")
+
+        if not national_id:
+            self.add_error("national_id", "الرقم القومي للمريض إلزامي.")
+        elif len(national_id) != 14 or not national_id.isdigit():
+            self.add_error("national_id", "الرقم القومي يجب أن يتكون من 14 رقماً صحيحاً.")
+        else:
+            # التحقق هل المريض مسجل مسبقاً بالنظام
+            patient = Patient.objects.filter(national_id=national_id).first()
+            if patient:
+                self.patient_instance = patient
+                self.is_new_patient = False
+            else:
+                self.patient_instance = None
+                self.is_new_patient = True
+
+                # التحقق من إدخال بيانات المريض الجديد الإلزامية
+                new_patient_checks = [
+                    ("full_name", "اسم المريض بالكامل إلزامي لتسجيل المريض الجديد."),
+                    ("gender", "النوع إلزامي لتسجيل المريض الجديد."),
+                    ("insurance_law", "قانون التأمين إلزامي لتسجيل المريض الجديد."),
+                    ("insurance_number", "الرقم التأميني إلزامي لتسجيل المريض الجديد."),
+                    ("affiliated_branch", "الفرع التابع له المريض إلزامي."),
+                    ("diagnosis", "التشخيص الطبي إلزامي."),
+                ]
+                for f_name, f_err in new_patient_checks:
+                    if not cleaned_data.get(f_name):
+                        self.add_error(f_name, f_err)
 
         if request_type == RequestType.ATG:
             if not patient_weight or patient_weight <= Decimal("0"):
@@ -96,46 +176,65 @@ class BmtRequestCreateForm(BaseStyledForm):
     def save(self, commit=True, user=None):
         instance = super().save(commit=False)
 
-        if not instance.request_code:
-            instance.request_code = generate_request_code()
+        with transaction.atomic():
+            if getattr(self, "patient_instance", None):
+                patient = self.patient_instance
+            else:
+                # إنشاء مريض جديد مشترك في قاعدة البيانات
+                patient = Patient.objects.create(
+                    national_id=self.cleaned_data["national_id"].strip(),
+                    full_name=self.cleaned_data["full_name"].strip(),
+                    gender=self.cleaned_data["gender"],
+                    insurance_law=self.cleaned_data["insurance_law"],
+                    insurance_number=self.cleaned_data["insurance_number"].strip(),
+                    affiliated_branch=self.cleaned_data["affiliated_branch"],
+                    phone_number=(self.cleaned_data.get("phone_number") or "").strip(),
+                    diagnosis=self.cleaned_data["diagnosis"].strip(),
+                )
 
-        # احتساب الحسابات المالية والقيم التاريخية
-        if instance.request_type == RequestType.ATG:
-            calc = calculate_atg_dose(instance.patient_weight)
-            instance.atg_total_mg = calc["total_mg"]
-            instance.atg_dose_ampules = calc["ampules"]
-            instance.atg_ampule_price = calc["ampule_price"]
-            instance.approved_amount = calc["total_cost"]
-            instance.amount_in_words = calc["cost_in_words"]
-            instance.payment_type = PaymentType.SINGLE
-            instance.installment_1 = calc["total_cost"]
-            instance.installment_2 = Decimal("0.00")
-        else:
-            fin = determine_bmt_financials(instance.request_type, instance.hospital)
-            instance.approved_amount = fin["approved_amount"]
-            instance.amount_in_words = fin["amount_in_words"]
-            instance.payment_type = fin["payment_type"]
-            instance.installment_1 = fin["installment_1"]
-            instance.installment_2 = fin["installment_2"]
+            instance.patient = patient
 
-        instance.routing_destination = determine_memo_routing(
-            instance.request_type,
-            instance.patient.get_affiliated_branch_display()
-        )
-        instance.status = RequestStatus.DRAFT
+            if not instance.request_code:
+                instance.request_code = generate_request_code()
 
-        if commit:
-            instance.save()
-            record_memo_movement(
-                bmt_request=instance,
-                action=MovementAction.CREATED,
-                to_status=RequestStatus.DRAFT,
-                destination=instance.routing_destination,
-                notes="تم إنشاء الطلب واحتساب المذكرة المالية آلياً.",
-                user=user,
+            # احتساب الحسابات المالية والقيم التاريخية
+            if instance.request_type == RequestType.ATG:
+                calc = calculate_atg_dose(instance.patient_weight)
+                instance.atg_total_mg = calc["total_mg"]
+                instance.atg_dose_ampules = calc["ampules"]
+                instance.atg_ampule_price = calc["ampule_price"]
+                instance.approved_amount = calc["total_cost"]
+                instance.amount_in_words = calc["cost_in_words"]
+                instance.payment_type = PaymentType.SINGLE
+                instance.installment_1 = calc["total_cost"]
+                instance.installment_2 = Decimal("0.00")
+            else:
+                fin = determine_bmt_financials(instance.request_type, instance.hospital)
+                instance.approved_amount = fin["approved_amount"]
+                instance.amount_in_words = fin["amount_in_words"]
+                instance.payment_type = fin["payment_type"]
+                instance.installment_1 = fin["installment_1"]
+                instance.installment_2 = fin["installment_2"]
+
+            instance.routing_destination = determine_memo_routing(
+                instance.request_type,
+                instance.patient.get_affiliated_branch_display()
             )
+            instance.status = RequestStatus.DRAFT
+
+            if commit:
+                instance.save()
+                record_memo_movement(
+                    bmt_request=instance,
+                    action=MovementAction.CREATED,
+                    to_status=RequestStatus.DRAFT,
+                    destination=instance.routing_destination,
+                    notes="تم إنشاء الطلب واحتساب المذكرة المالية آلياً.",
+                    user=user,
+                )
 
         return instance
+
 
 
 class BmtRequestUpdateForm(BaseStyledForm):
