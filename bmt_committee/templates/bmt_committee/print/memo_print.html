@@ -44,17 +44,13 @@
 
             <div class="memo-dotted-separator"></div>
 
-            <div class="memo-writer-initials">
-                أ/ غادة
-            </div>
-
             <!-- Addressed Authority -->
             <div class="memo-recipient">
                 السيد الدكتور / رئيس الإدارة المركزية للشئون الطبية
             </div>
 
-            <!-- Meta Row -->
-            <div class="memo-meta-row">
+            <!-- Meta Info -->
+            <div class="memo-meta-info">
                 <div>جهة العرض: - الإدارة العامة للخدمات الطبية.</div>
                 <div>تاريخ العرض: - {{ request_obj.memo_date|date:"Y/m/d"|default:today_date|date:"Y/m/d" }}</div>
             </div>
@@ -174,7 +170,7 @@
 
             <!-- Footer Code -->
             <div class="memo-footer-code">
-                أ/ غادة - {{ request_obj.request_code }}
+                {{ request.user.get_full_name|default:request.user.username }} - {{ request_obj.request_code }}
             </div>
 
         </main>

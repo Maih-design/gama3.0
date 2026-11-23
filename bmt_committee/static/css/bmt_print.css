@@ -146,12 +146,12 @@ body {
     text-underline-offset: 4px;
 }
 
-.memo-meta-row {
-    display: flex;
-    justify-content: space-between;
+.memo-meta-row,
+.memo-meta-info {
     font-size: 12.5pt;
     font-weight: 600;
     margin-bottom: 0.75rem;
+    line-height: 1.6;
 }
 
 .memo-section-title {
