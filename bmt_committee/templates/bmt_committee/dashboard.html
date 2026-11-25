@@ -79,16 +79,16 @@
             </div>
 
             <div class="card" style="padding: 1.25rem; text-align: center; border-top: 4px solid #6366f1;">
-                <div style="font-size: 0.85rem; color: #4338ca; font-weight: 600;">ATG بانتظار التواصل</div>
+                <div style="font-size: 0.85rem; color: #4338ca; font-weight: 600;">ATG بانتظار الخدمة الاجتماعية</div>
                 <div style="font-size: 2rem; font-weight: 700; color: #4f46e5; margin-top: 0.25rem;">
-                    {{ stats.atg_pending_contact }}
+                    {{ stats.atg_pending_handover }}
                 </div>
             </div>
 
             <div class="card" style="padding: 1.25rem; text-align: center; border-top: 4px solid #8b5cf6;">
-                <div style="font-size: 0.85rem; color: #6d28d9; font-weight: 600;">ATG بانتظار تسليم الخطاب</div>
+                <div style="font-size: 0.85rem; color: #6d28d9; font-weight: 600;">معتمدة بانتظار التوجيه</div>
                 <div style="font-size: 2rem; font-weight: 700; color: #7c3aed; margin-top: 0.25rem;">
-                    {{ stats.atg_pending_delivery }}
+                    {{ stats.bmt_pending_routing }}
                 </div>
             </div>
 
@@ -141,7 +141,7 @@
                                     {{ req.approved_amount|floatformat:2 }} ج.م
                                 </td>
                                 <td class="data-table__cell">
-                                    <span class="status {% if req.status == 'APPROVED' or req.status == 'COMPLETED' or req.status == 'LETTER_DELIVERED' %}status-approved{% elif req.status == 'REJECTED' %}status-cancelled{% elif req.status == 'SENT_FOR_APPROVAL' %}status-reviewing{% else %}status-pending{% endif %}">
+                                    <span class="status {% if req.status == 'APPROVED' or req.status == 'COMPLETED' %}status-approved{% elif req.status == 'REJECTED' %}status-cancelled{% elif req.status == 'SENT_FOR_APPROVAL' or req.status == 'PENDING_SOCIAL_SERVICES' %}status-reviewing{% else %}status-pending{% endif %}">
                                         {{ req.get_status_display }}
                                     </span>
                                 </td>

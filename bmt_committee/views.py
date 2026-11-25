@@ -11,6 +11,7 @@ from .forms import (
     BmtRequestUpdateForm,
     ChangeHospitalForm,
     RecordReturnForm,
+    RouteMemoForm,
     SendForApprovalForm,
     SocialServicesHandoverForm,
 )
@@ -32,6 +33,9 @@ def bmt_home(request):
             request_type=RequestType.ATG,
             status=RequestStatus.PENDING_SOCIAL_SERVICES
         ).count(),
+        "pending_routing": requests_qs.filter(
+            status=RequestStatus.APPROVED
+        ).exclude(request_type=RequestType.ATG).count(),
     }
     return render(
         request,
@@ -64,6 +68,9 @@ def dashboard(request):
             request_type=RequestType.ATG,
             status=RequestStatus.PENDING_SOCIAL_SERVICES
         ).count(),
+        "bmt_pending_routing": requests_qs.filter(
+            status=RequestStatus.APPROVED
+        ).exclude(request_type=RequestType.ATG).count(),
         "completed": requests_qs.filter(status=RequestStatus.COMPLETED).count(),
     }
 
@@ -112,6 +119,7 @@ def request_list(request):
             | Q(request_code__icontains=search)
             | Q(manual_outgoing_number__icontains=search)
             | Q(manual_incoming_number__icontains=search)
+            | Q(dispatch_outgoing_number__icontains=search)
         )
 
     if request_type and request_type in RequestType.values:
@@ -438,6 +446,75 @@ def handover_to_social_services(request, pk):
             "bmt_request": bmt_request,
         }
     )
+
+
+@login_required
+def route_memo(request, pk):
+    """
+    تسجيل توجيه وإرسال المذكرة المعتمدة (برقم صادر جديد)
+    إلى الفرع (لإصدار الخطاب) أو رئاسة الهيئة (لاستخراج أمر الدفع)
+    """
+    from django.utils import timezone
+    bmt_request = get_object_or_404(
+        BmtRequest.objects.select_related("patient", "hospital"),
+        pk=pk
+    )
+
+    if bmt_request.request_type == RequestType.ATG:
+        messages.warning(request, "حالات عقار ATG يتم تسليمها للخدمة الاجتماعية بالإدارة.")
+        return redirect("bmt_committee:request_detail", pk=bmt_request.pk)
+
+    if bmt_request.status != RequestStatus.APPROVED:
+        messages.warning(request, "يمكن تسجيل توجيه المذكرة فقط للطلبات المعتمدة.")
+        return redirect("bmt_committee:request_detail", pk=bmt_request.pk)
+
+    if request.method == "POST":
+        form = RouteMemoForm(request.POST)
+        if form.is_valid():
+            dispatch_no = form.cleaned_data["dispatch_outgoing_number"].strip()
+            dispatch_date = form.cleaned_data["dispatch_outgoing_date"]
+            notes = form.cleaned_data["notes"].strip()
+
+            bmt_request.dispatch_outgoing_number = dispatch_no
+            bmt_request.dispatch_outgoing_date = dispatch_date
+            bmt_request.save(update_fields=[
+                "dispatch_outgoing_number",
+                "dispatch_outgoing_date",
+                "updated_at",
+            ])
+
+            notes_full = f"تم توجيه وإرسال المذكرة برقم صادر جديد ({dispatch_no}) بتاريخ ({dispatch_date}) إلى: {bmt_request.routing_destination}. {notes}".strip()
+
+            record_memo_movement(
+                bmt_request=bmt_request,
+                action=MovementAction.ROUTED,
+                to_status=RequestStatus.COMPLETED,
+                destination=bmt_request.routing_destination,
+                notes=notes_full,
+                user=request.user,
+            )
+
+            messages.success(
+                request,
+                f"تم تسجيل توجيه المذكرة بنجاح برقم صادر {dispatch_no} إلى: {bmt_request.routing_destination} واكتمال دورة الطلب."
+            )
+            return redirect("bmt_committee:request_detail", pk=bmt_request.pk)
+    else:
+        initial = {
+            "dispatch_outgoing_number": bmt_request.dispatch_outgoing_number,
+            "dispatch_outgoing_date": bmt_request.dispatch_outgoing_date or timezone.now().date(),
+        }
+        form = RouteMemoForm(initial=initial)
+
+    return render(
+        request,
+        "bmt_committee/actions/route_memo.html",
+        {
+            "form": form,
+            "bmt_request": bmt_request,
+        }
+    )
+
 
 
 @login_required

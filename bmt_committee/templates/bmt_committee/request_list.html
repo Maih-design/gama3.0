@@ -45,7 +45,7 @@
 
             <div style="flex: 2; min-width: 240px;">
                 <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: #475569;">
-                    البحث (اسم المريض، الرقم القومي، كود الطلب، رقم الصادر أو الوارد الدفتري)
+                    البحث (اسم المريض، الرقم القومي، كود الطلب، رقم الصادر أو الوارد أو صادر التوجيه)
                 </label>
                 <input
                     type="text"
@@ -147,7 +147,7 @@
                                 {{ req.manual_incoming_number|default:"-" }}
                             </td>
                             <td class="data-table__cell">
-                                <span class="status {% if req.status == 'APPROVED' or req.status == 'COMPLETED' or req.status == 'LETTER_DELIVERED' %}status-approved{% elif req.status == 'REJECTED' %}status-cancelled{% elif req.status == 'SENT_FOR_APPROVAL' %}status-reviewing{% else %}status-pending{% endif %}">
+                                <span class="status {% if req.status == 'APPROVED' or req.status == 'COMPLETED' %}status-approved{% elif req.status == 'REJECTED' %}status-cancelled{% elif req.status == 'SENT_FOR_APPROVAL' or req.status == 'PENDING_SOCIAL_SERVICES' %}status-reviewing{% else %}status-pending{% endif %}">
                                     {{ req.get_status_display }}
                                 </span>
                             </td>

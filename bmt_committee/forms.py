@@ -438,3 +438,33 @@ class SocialServicesHandoverForm(forms.Form):
         required=False,
         widget=forms.Textarea(attrs={"class": "form-textarea", "rows": 3, "placeholder": "أي ملاحظات إضافية حول تسليم المذكرة للخدمة الاجتماعية"}),
     )
+
+
+class RouteMemoForm(forms.Form):
+    dispatch_outgoing_number = forms.CharField(
+        label="رقم صادر التوجيه (رقم الصادر الجديد)",
+        max_length=100,
+        required=True,
+        widget=forms.TextInput(attrs={
+            "class": "form-input",
+            "placeholder": "أدخل رقم الصادر الجديد للمذكرة المتجهة للفرع أو الهيئة"
+        }),
+    )
+    dispatch_outgoing_date = forms.DateField(
+        label="تاريخ صادر التوجيه",
+        required=True,
+        widget=forms.DateInput(attrs={
+            "type": "date",
+            "class": "form-input"
+        }),
+    )
+    notes = forms.CharField(
+        label="ملاحظات وتفاصيل التوجيه",
+        required=False,
+        widget=forms.Textarea(attrs={
+            "class": "form-textarea",
+            "rows": 3,
+            "placeholder": "رقم الحافظة، اسم المستلم، أو أي ملاحظات إدارية حول توجيه المذكرة"
+        }),
+    )
+

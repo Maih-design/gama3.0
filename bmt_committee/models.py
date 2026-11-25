@@ -319,6 +319,16 @@ class BmtRequest(models.Model):
         blank=True,
         verbose_name="تاريخ الوارد الدفتري"
     )
+    dispatch_outgoing_number = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="رقم صادر توجيه المذكرة"
+    )
+    dispatch_outgoing_date = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name="تاريخ صادر توجيه المذكرة"
+    )
     routing_destination = models.CharField(
         max_length=255,
         blank=True,

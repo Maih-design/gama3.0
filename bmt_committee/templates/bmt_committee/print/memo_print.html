@@ -52,7 +52,7 @@
             <!-- Meta Info -->
             <div class="memo-meta-info">
                 <div>جهة العرض: - الإدارة العامة للخدمات الطبية.</div>
-                <div>تاريخ العرض: - {{ request_obj.memo_date|date:"Y/m/d"|default:today_date|date:"Y/m/d" }}</div>
+                <div>تاريخ العرض: - {{ request_obj.memo_date|default:today_date|date:"Y/m/d" }}</div>
             </div>
 
             <!-- ==============================================

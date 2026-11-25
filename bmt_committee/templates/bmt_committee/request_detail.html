@@ -39,6 +39,10 @@
             <a href="{% url 'bmt_committee:handover_social_services' request_obj.pk %}" class="btn btn-primary" style="background: #4f46e5;">
                 تسجيل تسليم المذكرة للخدمة الاجتماعية
             </a>
+            {% elif request_obj.status == 'APPROVED' and request_obj.request_type != 'ATG' %}
+            <a href="{% url 'bmt_committee:route_memo' request_obj.pk %}" class="btn btn-primary" style="background: #0f766e;">
+                تسجيل توجيه المذكرة ({{ request_obj.routing_destination }}) &larr;
+            </a>
             {% endif %}
 
             {% if can_change_hosp %}
@@ -219,7 +223,7 @@
                 </div>
 
                 <div class="card-body" style="padding: 1.5rem;">
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem;">
                         <div>
                             <span style="font-size: 0.85rem; color: #64748b; display: block;">تاريخ العرض / المذكرة:</span>
                             <strong>{{ request_obj.memo_date|date:"Y-m-d"|default:"قيد التجهيز" }}</strong>
@@ -236,6 +240,13 @@
                             <strong>{{ request_obj.manual_incoming_number|default:"-" }}</strong>
                             {% if request_obj.manual_incoming_date %}
                             <small style="color: #64748b; display: block;">({{ request_obj.manual_incoming_date|date:"Y-m-d" }})</small>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <span style="font-size: 0.85rem; color: #64748b; display: block;">صادر التوجيه (للجهة المختصة):</span>
+                            <strong>{{ request_obj.dispatch_outgoing_number|default:"-" }}</strong>
+                            {% if request_obj.dispatch_outgoing_date %}
+                            <small style="color: #64748b; display: block;">({{ request_obj.dispatch_outgoing_date|date:"Y-m-d" }})</small>
                             {% endif %}
                         </div>
                     </div>

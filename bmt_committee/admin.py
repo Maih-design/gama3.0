@@ -60,6 +60,7 @@ class BmtRequestAdmin(admin.ModelAdmin):
         "patient__national_id",
         "manual_outgoing_number",
         "manual_incoming_number",
+        "dispatch_outgoing_number",
     )
     inlines = [MemoMovementInline]
     readonly_fields = ("request_code", "created_at", "updated_at")
